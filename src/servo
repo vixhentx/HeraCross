@@ -1,25 +1,9 @@
 #pragma once
 #include <Arduino.h>
-#include "tickable"
 
 namespace HeraCross
 {
-class Servo;
-class ServoBus;
 
-class ServoBus : public Tickable
-{
-    private:
-    int cnt=0;
-    Servo* servos[SERVO_COUNT];
-    int i;
-    public:
-    void Register(Servo* s)
-    {
-        servos[cnt++]=s;
-    }
-    void tick(int nowtick) override;
-}servo_bus;
 class Servo
 {
     friend class ServoBus;
@@ -55,19 +39,4 @@ class Servo
     }
 };
 
-
-void ServoBus::tick(int nowtick)
-{
-    for(i=0;i<cnt;i++)
-    {
-        if(nowtick<servos[i]->pulse_width)
-        {
-            digitalWrite(servos[i]->pin,1);
-        }
-        else
-        {
-            digitalWrite(servos[i]->pin,0);
-        }
-    }
-}
 }
