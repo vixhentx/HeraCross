@@ -1,0 +1,35 @@
+#pragma once
+
+/*
+////////////////////
+/  Pin definition
+////////////////////
+*/
+#define MOTOR_LN_PIN 9
+#define MOTOR_LP_PIN 10
+#define MOTOR_RN_PIN 5
+#define MOTOR_RP_PIN 6
+
+//ATTENTION! ONLY pin 3,5,6,9,10 has PWM
+#define SERVO_TONG_PIN 3
+#define SERVO_CLEAVE_PIN 3 
+#define SERVO_NECK_PIN 3
+
+#define BLE_RX 0
+
+/*
+////////////////////
+/  Servo Config
+////////////////////
+*/
+#define SERVO_COUNT 3
+
+#define SERVO_TONG_MIN 0
+#define SERVO_TONG_MAX 180
+
+#define SERVO_CLEAVE_MIN 0
+#define SERVO_CLEAVE_MAX 180
+
+#define SERVO_NECK_MIN 0
+#define SERVO_NECK_MAX 180
+

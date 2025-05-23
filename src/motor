@@ -1,0 +1,37 @@
+#pragma once
+#include <Arduino.h>
+
+namespace HeraCross
+{
+class Motor
+{
+    private:
+    int pinN,pinP;
+    public:
+    Motor(int _pinN, int _pinP)
+    {
+        pinN=_pinN;
+        pinP=_pinP;
+    }
+    void Forward()
+    {
+        digitalWrite(pinN,0);
+        digitalWrite(pinP,1);
+    }
+    void Backward()
+    {
+        digitalWrite(pinN,1);
+        digitalWrite(pinP,0);
+    }
+    void Off()
+    {
+        digitalWrite(pinN,0);
+        digitalWrite(pinP,0);
+    }
+    void Brake()
+    {
+        digitalWrite(pinN,1);
+        digitalWrite(pinP,1);
+    }
+};
+}

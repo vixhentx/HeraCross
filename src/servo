@@ -1,0 +1,55 @@
+#pragma once
+#include <Arduino.h>
+#include <Arduino_FreeRTOS.h>
+
+namespace HeraCross
+{
+
+class Servo
+{
+    private:
+    int pin,maxAngle,minAngle,pulse_width;
+    static void task(void* arg)
+    {
+        Servo* servo=static_cast<Servo*>(arg);
+        for(;;)
+        {
+            digitalWrite(servo->pin,1);
+            vTaskDelay(servo->pulse_width);
+            digitalWrite(servo->pin,0);
+            vTaskDelay(20-servo->pulse_width);
+        }
+    }
+    public:
+    Servo(int _pin,int _maxAngle, int _minAngle,const char* _taskName)
+    {
+        pin=_pin;
+        maxAngle=_maxAngle;
+        minAngle=_minAngle;
+        xTaskCreate(
+            task,
+            _taskName,
+            128,
+            this,
+            2,
+            nullptr
+        );
+    }
+    // void SetPulse(int pulse)
+    // {
+    //     analogWrite(pin,pulse);
+    // }
+    void SetAngle(int angle)
+    {
+        pulse_width=((angle*11)+500)/1000;
+    }
+    void TurnMax()
+    {
+        SetAngle(maxAngle);
+    }
+    void TurnMin()
+    {
+        SetAngle(minAngle);
+    }
+};
+}
