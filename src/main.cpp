@@ -4,10 +4,11 @@
 
 void setup()
 {
-    servo_cleave.TurnMax();
+    
 }
 
 void loop()
 {
-
+    // tick();
+    servo_cleave.SetPulse(1500);
 }

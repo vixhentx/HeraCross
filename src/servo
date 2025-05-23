@@ -1,47 +1,49 @@
 #pragma once
 #include <Arduino.h>
-#include <Arduino_FreeRTOS.h>
+#include "tickable"
 
 namespace HeraCross
 {
+class Servo;
+class ServoBus;
 
-class Servo
+class ServoBus : public Tickable
 {
     private:
-    int pin,maxAngle,minAngle,pulse_width;
-    static void task(void* arg)
+    int cnt=0;
+    Servo* servos[SERVO_COUNT];
+    int i;
+    public:
+    void Register(Servo* s)
     {
-        Servo* servo=static_cast<Servo*>(arg);
-        for(;;)
-        {
-            digitalWrite(servo->pin,1);
-            vTaskDelay(servo->pulse_width);
-            digitalWrite(servo->pin,0);
-            vTaskDelay(20-servo->pulse_width);
-        }
+        servos[cnt++]=s;
     }
+    void tick(int nowtick) override;
+}servo_bus;
+class Servo
+{
+    friend class ServoBus;
+    private:
+    int pin,maxAngle,minAngle,pulse_width;
     public:
     Servo(int _pin,int _maxAngle, int _minAngle,const char* _taskName)
     {
         pin=_pin;
         maxAngle=_maxAngle;
         minAngle=_minAngle;
-        xTaskCreate(
-            task,
-            _taskName,
-            128,
-            this,
-            2,
-            nullptr
-        );
+        // servo_bus.Register(this);
     }
-    // void SetPulse(int pulse)
-    // {
-    //     analogWrite(pin,pulse);
-    // }
+    void SetPulse(int pulse)
+    {
+        // pulse_width=pulse_in_100us;
+        digitalWrite(pin,1);
+        delayMicroseconds(pulse);
+        digitalWrite(pin,0);
+        delay(20-pulse_width/1000);
+    }
     void SetAngle(int angle)
     {
-        pulse_width=((angle*11)+500)/1000;
+        SetPulse(((angle*11)+500));
     }
     void TurnMax()
     {
@@ -52,4 +54,20 @@ class Servo
         SetAngle(minAngle);
     }
 };
+
+
+void ServoBus::tick(int nowtick)
+{
+    for(i=0;i<cnt;i++)
+    {
+        if(nowtick<servos[i]->pulse_width)
+        {
+            digitalWrite(servos[i]->pin,1);
+        }
+        else
+        {
+            digitalWrite(servos[i]->pin,0);
+        }
+    }
+}
 }

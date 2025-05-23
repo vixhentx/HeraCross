@@ -11,3 +11,8 @@ HeraCross::Motor motor_r(MOTOR_RN_PIN,MOTOR_RP_PIN);
 HeraCross::Servo servo_tong(SERVO_TONG_PIN,SERVO_TONG_MAX,SERVO_TONG_MIN,"tsk_svtong");
 HeraCross::Servo servo_cleave(SERVO_CLEAVE_PIN,SERVO_CLEAVE_MAX,SERVO_CLEAVE_MIN,"tsk_svcleave");
 HeraCross::Servo servo_neck(SERVO_NECK_PIN,SERVO_NECK_MAX,SERVO_NECK_MIN,"tsk_svneck");
+
+void tick()
+{
+    // HeraCross::servo_bus.tick();
+}
