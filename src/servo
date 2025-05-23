@@ -4,20 +4,19 @@
 namespace HeraCross
 {
 
-class Servo
+class PulseServo
 {
-    friend class ServoBus;
     private:
     int pin,maxAngle,minAngle,pulse_width;
     public:
-    Servo(int _pin,int _maxAngle, int _minAngle,const char* _taskName)
+    PulseServo(int _pin,int _maxAngle, int _minAngle)
     {
         pin=_pin;
         maxAngle=_maxAngle;
         minAngle=_minAngle;
-        // servo_bus.Register(this);
+        digitalWrite(pin,1);
     }
-    void SetPulse(int pulse)
+    virtual void SetPulse(int pulse)
     {
         // pulse_width=pulse_in_100us;
         digitalWrite(pin,1);
@@ -25,17 +24,49 @@ class Servo
         digitalWrite(pin,0);
         delay(20-pulse_width/1000);
     }
-    void SetAngle(int angle)
+    void SetPulse(int pulse,int rep)
     {
-        SetPulse(((angle*11)+500));
+        while(rep--)
+        {
+            SetPulse(pulse);
+        }
+    }
+    virtual void SetAngle(int angle,int rep)
+    {
+        SetPulse(((angle*11)+500),rep);
+    }
+    void TurnMax(int rep=100)
+    {
+        SetAngle(maxAngle,rep);
+    }
+    void TurnMin(int rep=100)
+    {
+        SetAngle(minAngle,rep);
+    }
+};
+class DutyServo 
+{
+    private:
+    int pin,maxAngle,minAngle,pulse_width;
+    public:
+    DutyServo(int _pin,int _maxAngle, int _minAngle)
+    {
+        pin=_pin;
+        maxAngle=_maxAngle;
+        minAngle=_minAngle;
+        digitalWrite(pin,1);
+    }
+    void SetPulse(int pulse)
+    {
+        analogWrite(pin,pulse);
     }
     void TurnMax()
     {
-        SetAngle(maxAngle);
+        SetPulse(maxAngle);
     }
     void TurnMin()
     {
-        SetAngle(minAngle);
+        SetPulse(minAngle);
     }
 };
 
