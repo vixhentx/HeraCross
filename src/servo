@@ -1,5 +1,6 @@
 #pragma once
 #include <Arduino.h>
+#include <Servo.h>
 
 namespace HeraCross
 {
@@ -67,6 +68,31 @@ class DutyServo
     void TurnMin()
     {
         SetPulse(minAngle);
+    }
+};
+class InstanceServo
+{
+    private:
+    int maxAngle,minAngle;
+    Servo m_servo;
+    public:
+    InstanceServo(int _pin,int _maxAngle, int _minAngle)
+    {
+        maxAngle=_maxAngle;
+        minAngle=_minAngle;
+        m_servo.attach(_pin,500,2480);
+    }
+    void SetAngle(int angle)
+    {
+        m_servo.write(angle);
+    }
+    void TurnMax()
+    {
+        SetAngle(maxAngle);
+    }
+    void TurnMin()
+    {
+        SetAngle(minAngle);
     }
 };
 

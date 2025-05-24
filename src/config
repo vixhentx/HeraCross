@@ -32,3 +32,24 @@
 
 #define SERVO_NECK_MIN 30
 #define SERVO_NECK_MAX 150
+#define SERVO_NECK_MID 90
+
+/*
+////////////////////
+/  Command Config
+////////////////////
+*/
+#define CMD_TONG_OFF 20
+#define CMD_TONG_ON 21
+
+#define CMD_NECK_OFF 22
+#define CMD_NECK_ON 23
+#define CMD_NECK_MID 24
+
+#define CMD_CLEAVE_OFF 25
+#define CMD_CLEAVE_ON 26
+
+#define CMD_MOTOR_L_F 11
+#define CMD_MOTOR_L_B 12
+#define CMD_MOTOR_R_F 13
+#define CMD_MOTOR_R_B 14
