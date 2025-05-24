@@ -69,6 +69,24 @@ void loop()
         case CMD_MOTOR_R_B:
             motor_r.Backward();
             break;
+        case CMD_MOTOR_L_HALT:
+            motor_l.Off();
+            break;
+        case CMD_MOTOR_R_HALT:
+            motor_r.Off();
+            break;
+        case CMD_STEP_HALT:
+            motor_l.Off();
+            motor_r.Off();
+            break;
+        case CMD_STEP_F:
+            motor_l.Forward();
+            motor_r.Forward();
+            break;
+        case CMD_STEP_B:
+            motor_l.Backward();
+            motor_r.Backward();
+            break;
         default:
             break;
         }

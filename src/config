@@ -51,5 +51,12 @@
 
 #define CMD_MOTOR_L_F 11
 #define CMD_MOTOR_L_B 12
-#define CMD_MOTOR_R_F 13
-#define CMD_MOTOR_R_B 14
+#define CMD_MOTOR_L_HALT 13
+
+#define CMD_MOTOR_R_F 15
+#define CMD_MOTOR_R_B 16
+#define CMD_MOTOR_R_HALT 17
+
+#define CMD_STEP_F 51
+#define CMD_STEP_B 52
+#define CMD_STEP_HALT 53
