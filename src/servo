@@ -31,7 +31,7 @@ class PulseServo
             SetPulse(pulse);
         }
     }
-    virtual void SetAngle(int angle,int rep)
+    virtual void SetAngle(int angle,int rep=100)
     {
         SetPulse(((angle*11)+500),rep);
     }

@@ -10,22 +10,26 @@ void self_test()
     delay(1000);
 
     servo_cleave.TurnMin();
-    delay(1000);
+    delay(500);
     servo_cleave.TurnMax();
-    delay(1000);
+    delay(500);
 
     servo_neck.TurnMax();
-    delay(1000);
+    delay(500);
     servo_neck.TurnMin();
-    delay(1000);
+    delay(500);
 }
 
 void setup()
 {
     delay(200);
+    Serial.begin(9600);
+    // motor_l.Forward();
+    // motor_r.Forward();
 }
 
 void loop()
 {
-    self_test();
+    // self_test();
+    
 }
