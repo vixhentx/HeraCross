@@ -36,7 +36,7 @@ void loop()
     cmd=Serial.parseInt();
     if(cmd)
     {
-        cmd_runner.TryRun(cmd);
+        commands.TryRun(cmd);
     }
     cmd=0;
 }

@@ -26,13 +26,17 @@ void cmd_step_halt_handler();
 void act_grab_handler();
 void act_climb_handler();
 void act_safe_cleave_up_handler();
+void act_dont_die_handler();
 
 // 注册表
 cmd_handler_t cmd_table[CMD_MAX_COUNT];
 
 
-struct Commands
+class Commands
 {
+    private:
+    int runned_count=0;
+    public:
     Commands()
     {
         REG_CMD(CMD_MOTOR_L_F,    cmd_motor_l_f_handler);
@@ -54,12 +58,19 @@ struct Commands
         REG_CMD(ACT_GRAB,        act_grab_handler);
         REG_CMD(ACT_CLIMB,       act_climb_handler);
         REG_CMD(ACT_SAFE_CLEAVE_UP, act_safe_cleave_up_handler);
+        REG_CMD(ACT_DONT_DIE,       act_dont_die_handler);
     }
     void TryRun(int cmd)
     {
         if(cmd_table[cmd]!=nullptr)
         {
             cmd_table[cmd]();
+            Serial.print("CMD_SUC_ID:");
+            Serial.println(runned_count++);
+        }
+        else
+        {
+            Serial.println("CMD_FAIL");
         }
     }
 };
@@ -133,7 +144,7 @@ void cmd_step_halt_handler() {
 }
 
 void act_grab_handler() {
-    servo_neck.SetAngle(SERVO_NECK_MID);
+    servo_neck.SetAngle(SERVO_NECK_MID,30);
     servo_tong.TurnMax();
     servo_cleave.TurnMin();
     servo_tong.TurnMin();
@@ -142,29 +153,62 @@ void act_grab_handler() {
     servo_neck.TurnMin();
 }
 
+//爬台阶命令,前轮到台阶就可以点,尽量靠右一点
 void act_climb_handler() {
     servo_neck.TurnMin();
     
+    REP(2){
     motor_l.Forward();
     motor_r.Forward();
-    delay(200);  // 这个时间要够短，前轮刚好上去就行
+    delay(400);  // 这个时间要够短，前轮刚好上去就行
     motor_l.Off();
     motor_r.Off();
 
     servo_cleave.SetAngle(SERVO_CLEAVE_CLIMB);
     motor_l.Forward();
     motor_r.Forward();
-    delay(500); //这里也要短一点，不要影响下一个台阶
+    delay(400); //这里也要短一点，不要影响下一个台阶
     motor_l.Off();
     motor_r.Off();
+
+    if(__REP_INNER_I__==0)servo_cleave.TurnMax();
+    }
+
+    //到此为止,已经爬过了两个台阶
+
+    //下台阶
+    motor_l.Forward();
+    motor_r.Forward();
+    delay(600);
+    motor_l.Brake();
+    motor_r.Brake();
+    delay(200);//等稳定
+    
+    act_safe_cleave_up_handler();
 
     
 }
 void act_safe_cleave_up_handler()
 {
-    servo_neck.SetAngle(SERVO_NECK_MID);
+    servo_neck.SetAngle(SERVO_NECK_MID,30);
     servo_cleave.TurnMax();
     servo_neck.TurnMin();
 }
+void act_dont_die_handler()
+{
+    servo_cleave.TurnMin();
+
+    motor_l.Forward();
+    motor_r.Forward();
+    delay(100);
+    motor_l.Off();
+    motor_r.Off();
+
+    servo_neck.SetAngle(SERVO_NECK_MID,30);
+
+    servo_cleave.TurnMax();
+
+    servo_neck.TurnMin();//最后朝前
 }
-HeraCross::Commands cmd_runner;
+}
+HeraCross::Commands commands;
