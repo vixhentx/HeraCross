@@ -32,15 +32,15 @@ class PulseServo
             SetPulse(pulse);
         }
     }
-    virtual void SetAngle(int angle,int rep=100)
+    virtual void SetAngle(int angle,int rep=50)
     {
         SetPulse(((angle*11)+500),rep);
     }
-    void TurnMax(int rep=100)
+    void TurnMax(int rep=50)
     {
         SetAngle(maxAngle,rep);
     }
-    void TurnMin(int rep=100)
+    void TurnMin(int rep=50)
     {
         SetAngle(minAngle,rep);
     }

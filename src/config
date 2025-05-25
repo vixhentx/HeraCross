@@ -29,6 +29,7 @@
 
 #define SERVO_CLEAVE_MIN 0
 #define SERVO_CLEAVE_MAX 110
+#define SERVO_CLEAVE_CLIMB 70
 
 #define SERVO_NECK_MIN 30
 #define SERVO_NECK_MAX 150
@@ -39,6 +40,16 @@
 /  Command Config
 ////////////////////
 */
+#define CMD_MAX_COUNT 100
+
+#define CMD_MOTOR_L_F 11
+#define CMD_MOTOR_L_B 12
+#define CMD_MOTOR_L_HALT 13
+
+#define CMD_MOTOR_R_F 15
+#define CMD_MOTOR_R_B 16
+#define CMD_MOTOR_R_HALT 17
+
 #define CMD_TONG_OFF 20
 #define CMD_TONG_ON 21
 
@@ -49,14 +60,19 @@
 #define CMD_CLEAVE_OFF 25
 #define CMD_CLEAVE_ON 26
 
-#define CMD_MOTOR_L_F 11
-#define CMD_MOTOR_L_B 12
-#define CMD_MOTOR_L_HALT 13
-
-#define CMD_MOTOR_R_F 15
-#define CMD_MOTOR_R_B 16
-#define CMD_MOTOR_R_HALT 17
 
 #define CMD_STEP_F 51
 #define CMD_STEP_B 52
 #define CMD_STEP_HALT 53
+
+#define ACT_GRAB 80
+#define ACT_CLIMB 81
+#define ACT_SAFE_CLEAVE_UP 82
+
+/*
+////////////////////
+/  Utils Config
+////////////////////
+*/
+#define REG_CMD(A,B) cmd_table[A]=B
+#define REP(X) for(int __REP_INNER_I__=0;__REP_INNER_I__<X;i++)
