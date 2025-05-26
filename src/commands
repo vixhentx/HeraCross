@@ -157,22 +157,35 @@ void act_grab_handler() {
 void act_climb_handler() {
     servo_neck.TurnMin();
     
-    REP(2){
+    //第一个台阶
     motor_l.Forward();
     motor_r.Forward();
-    delay(400);  // 这个时间要够短，前轮刚好上去就行
+    delay(250);  // 这个时间要够短，前轮刚好上去就行
     motor_l.Off();
     motor_r.Off();
 
     servo_cleave.SetAngle(SERVO_CLEAVE_CLIMB);
     motor_l.Forward();
     motor_r.Forward();
-    delay(400); //这里也要短一点，不要影响下一个台阶
+    delay(550); //这里也要短一点，不要影响下一个台阶
     motor_l.Off();
     motor_r.Off();
 
-    if(__REP_INNER_I__==0)servo_cleave.TurnMax();
-    }
+    servo_cleave.TurnMax();
+
+    //第二个台阶
+    motor_l.Forward();
+    motor_r.Forward();
+    delay(850);  // 这个时间要够短，前轮刚好上去就行
+    motor_l.Off();
+    motor_r.Off();
+
+    servo_cleave.SetAngle(SERVO_CLEAVE_CLIMB);
+    motor_l.Forward();
+    motor_r.Forward();
+    delay(550); //这里也要短一点，不要影响下一个台阶
+    motor_l.Off();
+    motor_r.Off();
 
     //到此为止,已经爬过了两个台阶
 
@@ -182,7 +195,7 @@ void act_climb_handler() {
     delay(600);
     motor_l.Brake();
     motor_r.Brake();
-    delay(200);//等稳定
+    delay(400);//等稳定
     
     act_safe_cleave_up_handler();
 
