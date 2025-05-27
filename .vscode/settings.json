@@ -1,0 +1,15 @@
+{
+    "stm32-for-vscode.openOCDPath": false,
+    "stm32-for-vscode.makePath": false,
+    "stm32-for-vscode.armToolchainPath": false,
+    "files.associations": {
+        "*.def": "cpp",
+        "servo": "cpp",
+        "config": "cpp",
+        "motor": "cpp",
+        "tasks": "cpp",
+        "*.ino": "cpp",
+        "conponent": "cpp",
+        "tickable": "cpp"
+    }
+}

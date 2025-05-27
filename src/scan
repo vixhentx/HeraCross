@@ -1,0 +1,90 @@
+#pragma once
+
+#include <Arduino.h>
+#include <SoftwareSerial.h>
+#include "config"
+
+namespace HeraCross
+{
+//扫描命令：7E 00 08 01 00 02 01 AB CD
+const static uint8_t HCMD_TRIGGER_SCAN[]={0x7E,0x00,0x08,0x01,0x00,0x02,0x01,0xAB,0xCD};
+//成功发送扫描后会返回：：02 00 00 01 00 33 31
+const static uint8_t HCMD_SUCCESS_SCAN[]={0x02,0x00,0x00,0x01,0x00,0x33,0x31};
+static char buf[COLOR_BUF_SIZE];
+class Scan
+{
+    private:
+    int pinRx,pinTx;
+    ::SoftwareSerial* serial;
+
+    
+    public:
+    Color target;
+    Color seq[COLOR_SEQ_COUNT];
+    Scan(int _pinRx,int _pinTx)
+    {
+        pinRx = _pinRx;
+        pinTx = _pinTx;
+        serial=new ::SoftwareSerial(pinRx,pinTx,false);
+        serial->begin(9600);
+    }
+    //@Deprecated
+    bool test()
+    {
+        int t;
+        serial->write(HCMD_TRIGGER_SCAN,sizeof(HCMD_TRIGGER_SCAN));
+        serial->flush();
+        delay(1000);
+        while((t=serial->readBytes(buf,sizeof(buf)))>0)
+        {
+            TRACE("read:");
+            for(int i=0;i<t;i++)
+            {
+                TRACE((uint8_t)buf[i]);
+                TRACE(" ");
+            }
+            TRACE("\n");
+        }
+        return true;
+    }
+    //读取颜色，并将颜色写到
+    bool get(int wait_time=1000)
+    {
+        int i;
+        serial->read();
+        serial->write(HCMD_TRIGGER_SCAN,sizeof(HCMD_TRIGGER_SCAN));
+        serial->flush();
+        TRACE("waiting for scan result");
+        delay(wait_time);
+        //确认返回信息
+        if((i=serial->readBytes(buf,sizeof(buf)))!=(int)(sizeof(HCMD_SUCCESS_SCAN)+COLOR_SAMPLE_SIZE))
+        {
+            TRACESV("wrong frame,size=",i);
+            int t=i;
+            for(i=0;i<t;i++)
+            {
+                TRACE((uint8_t)buf[i]);
+                TRACE(" ");
+            }
+            return false;
+        }
+        TRACE("scan result received");
+        for(i=0;i<(int)sizeof(HCMD_SUCCESS_SCAN);i++)
+        {
+            if(buf[i]!=HCMD_SUCCESS_SCAN[i])return false;
+        }
+        TRACE("trigger result confirmed");
+        TRACE("reading color sample");
+        char *pbuf=buf+sizeof(HCMD_SUCCESS_SCAN);
+        //解析buf        0 1 2 3 4   5   6
+        //              "1 + 3 2 1 \n"
+        target=Color(pbuf[0]-'0');
+        pbuf+=2;
+        for(int i=0;i<COLOR_SEQ_COUNT;i++)
+        {
+            seq[i]=Color(pbuf[i]-'0');
+        }
+        return true;
+    }
+};
+}
