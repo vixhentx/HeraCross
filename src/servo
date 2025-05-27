@@ -16,7 +16,7 @@ class PulseServo
         pin=_pin;
         maxAngle=_maxAngle;
         minAngle=_minAngle;
-        digitalWrite(pin,1);
+        digitalWrite(pin,0);
     }
     virtual void SetPulse(int pulse)
     {
@@ -24,26 +24,27 @@ class PulseServo
         digitalWrite(pin,1);
         delayMicroseconds(pulse);
         digitalWrite(pin,0);
-        time_until=micros()+pulse;//直接存储剩下需要delay的毫秒数，不使用delay阻塞
+        time_until=micros()+20000-pulse;//直接存储剩下需要delay的毫秒数，不使用delay阻塞
     }
     void SetPulse(int pulse,int rep)
     {
-        while(rep--)
-        {
-            SetPulse(pulse);
-        }
+        while(rep--)SetPulse(pulse);
     }
-    virtual void SetAngle(int angle,int rep=50)
+    void SetAngle(int angle)
     {
-        SetPulse(((angle*11)+500),rep);
+        SetPulse(((angle*11)+500));
     }
-    void TurnMax(int rep=50)
+    void SetAngle(int angle,int rep)
     {
-        SetAngle(maxAngle,rep);
+        while(rep--)SetAngle(angle);
     }
-    void TurnMin(int rep=50)
+    void TurnMax()
     {
-        SetAngle(minAngle,rep);
+        SetAngle(maxAngle);
+    }
+    void TurnMin()
+    {
+        SetAngle(minAngle);
     }
 };
 class DutyServo 
@@ -56,7 +57,7 @@ class DutyServo
         pin=_pin;
         maxAngle=_maxAngle;
         minAngle=_minAngle;
-        digitalWrite(pin,1);
+        digitalWrite(pin,0);
     }
     void SetPulse(int pulse)
     {
@@ -66,34 +67,17 @@ class DutyServo
     {
         SetPulse(maxAngle);
     }
+    void TurnMax(int rep)
+    {
+        while(rep--)TurnMax();
+    }
     void TurnMin()
     {
         SetPulse(minAngle);
     }
-};
-class InstanceServo
-{
-    private:
-    int maxAngle,minAngle;
-    Servo m_servo;
-    public:
-    InstanceServo(int _pin,int _maxAngle, int _minAngle)
+    void TurnMin(int rep)
     {
-        maxAngle=_maxAngle;
-        minAngle=_minAngle;
-        m_servo.attach(_pin,500,2480);
-    }
-    void SetAngle(int angle)
-    {
-        m_servo.write(angle);
-    }
-    void TurnMax()
-    {
-        SetAngle(maxAngle);
-    }
-    void TurnMin()
-    {
-        SetAngle(minAngle);
+        while(rep--)TurnMin();
     }
 };
 
