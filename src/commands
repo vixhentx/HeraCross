@@ -7,6 +7,7 @@ typedef void (*cmd_handler_t)(void);
 
 void TryRun(int cmd);
 // 声明
+void cmd_test_handler();
 void cmd_motor_l_f_handler();
 void cmd_motor_l_b_handler();
 void cmd_motor_l_halt_handler();
@@ -23,6 +24,7 @@ void cmd_cleave_on_handler();
 void cmd_step_f_handler();
 void cmd_step_b_handler();
 void cmd_step_halt_handler();
+void cmd_scan_handler();
 void act_grab_handler();
 void act_climb_handler();
 void act_safe_cleave_up_handler();
@@ -31,38 +33,40 @@ void act_dont_die_handler();
 // 注册表
 cmd_handler_t cmd_table[CMD_MAX_COUNT];
 
-
 class Commands
 {
-    private:
-    int runned_count=0;
-    public:
+private:
+    int runned_count = 0;
+
+public:
     Commands()
     {
-        REG_CMD(CMD_MOTOR_L_F,    cmd_motor_l_f_handler);
-        REG_CMD(CMD_MOTOR_L_B,    cmd_motor_l_b_handler);
+        REG_CMD(CMD_TEST, cmd_test_handler);
+        REG_CMD(CMD_MOTOR_L_F, cmd_motor_l_f_handler);
+        REG_CMD(CMD_MOTOR_L_B, cmd_motor_l_b_handler);
         REG_CMD(CMD_MOTOR_L_HALT, cmd_motor_l_halt_handler);
-        REG_CMD(CMD_MOTOR_R_F,    cmd_motor_r_f_handler);
-        REG_CMD(CMD_MOTOR_R_B,    cmd_motor_r_b_handler);
+        REG_CMD(CMD_MOTOR_R_F, cmd_motor_r_f_handler);
+        REG_CMD(CMD_MOTOR_R_B, cmd_motor_r_b_handler);
         REG_CMD(CMD_MOTOR_R_HALT, cmd_motor_r_halt_handler);
-        REG_CMD(CMD_TONG_OFF,     cmd_tong_off_handler);
-        REG_CMD(CMD_TONG_ON,      cmd_tong_on_handler);
-        REG_CMD(CMD_NECK_OFF,     cmd_neck_off_handler);
-        REG_CMD(CMD_NECK_ON,      cmd_neck_on_handler);
-        REG_CMD(CMD_NECK_MID,     cmd_neck_mid_handler);
-        REG_CMD(CMD_CLEAVE_OFF,   cmd_cleave_off_handler);
-        REG_CMD(CMD_CLEAVE_ON,    cmd_cleave_on_handler);
-        REG_CMD(CMD_STEP_F,       cmd_step_f_handler);
-        REG_CMD(CMD_STEP_B,       cmd_step_b_handler);
-        REG_CMD(CMD_STEP_HALT,   cmd_step_halt_handler);
-        REG_CMD(ACT_GRAB,        act_grab_handler);
-        REG_CMD(ACT_CLIMB,       act_climb_handler);
+        REG_CMD(CMD_TONG_OFF, cmd_tong_off_handler);
+        REG_CMD(CMD_TONG_ON, cmd_tong_on_handler);
+        REG_CMD(CMD_NECK_OFF, cmd_neck_off_handler);
+        REG_CMD(CMD_NECK_ON, cmd_neck_on_handler);
+        REG_CMD(CMD_NECK_MID, cmd_neck_mid_handler);
+        REG_CMD(CMD_CLEAVE_OFF, cmd_cleave_off_handler);
+        REG_CMD(CMD_CLEAVE_ON, cmd_cleave_on_handler);
+        REG_CMD(CMD_STEP_F, cmd_step_f_handler);
+        REG_CMD(CMD_STEP_B, cmd_step_b_handler);
+        REG_CMD(CMD_STEP_HALT, cmd_step_halt_handler);
+        REG_CMD(CMD_SCAN, cmd_scan_handler);
+        REG_CMD(ACT_GRAB, act_grab_handler);
+        REG_CMD(ACT_CLIMB, act_climb_handler);
         REG_CMD(ACT_SAFE_CLEAVE_UP, act_safe_cleave_up_handler);
-        REG_CMD(ACT_DONT_DIE,       act_dont_die_handler);
+        REG_CMD(ACT_DONT_DIE, act_dont_die_handler);
     }
     void TryRun(int cmd)
     {
-        if(cmd_table[cmd]!=nullptr)
+        if (cmd_table[cmd] != nullptr)
         {
             cmd_table[cmd]();
             Serial.print("CMD_SUC_ID:");
@@ -76,75 +80,113 @@ class Commands
 };
 
 // 实现
-void cmd_tong_off_handler() {
+
+void cmd_test_handler()
+{
+    scan.test();
+}
+
+void cmd_tong_off_handler()
+{
     servo_tong.TurnMin();
 }
 
-void cmd_tong_on_handler() {
+void cmd_tong_on_handler()
+{
     servo_tong.TurnMax();
 }
 
-void cmd_neck_off_handler() {
+void cmd_neck_off_handler()
+{
     servo_neck.TurnMin();
 }
 
-void cmd_neck_on_handler() {
+void cmd_neck_on_handler()
+{
     servo_neck.TurnMax();
 }
 
-void cmd_neck_mid_handler() {
+void cmd_neck_mid_handler()
+{
     servo_neck.SetAngle(SERVO_NECK_MID);
 }
 
-void cmd_cleave_off_handler() {
+void cmd_cleave_off_handler()
+{
     servo_cleave.TurnMin();
 }
 
-void cmd_cleave_on_handler() {
+void cmd_cleave_on_handler()
+{
     servo_cleave.TurnMax();
 }
 
-void cmd_motor_l_f_handler() {
+void cmd_motor_l_f_handler()
+{
     motor_l.Forward();
 }
 
-void cmd_motor_l_b_handler() {
+void cmd_motor_l_b_handler()
+{
     motor_l.Backward();
 }
 
-void cmd_motor_l_halt_handler() {
+void cmd_motor_l_halt_handler()
+{
     motor_l.Off();
 }
 
-void cmd_motor_r_f_handler() {
+void cmd_motor_r_f_handler()
+{
     motor_r.Forward();
 }
 
-void cmd_motor_r_b_handler() {
+void cmd_motor_r_b_handler()
+{
     motor_r.Backward();
 }
 
-void cmd_motor_r_halt_handler() {
+void cmd_motor_r_halt_handler()
+{
     motor_r.Off();
 }
 
-void cmd_step_f_handler() {
+void cmd_step_f_handler()
+{
     motor_l.Forward();
     motor_r.Forward();
 }
 
-void cmd_step_b_handler() {
+void cmd_step_b_handler()
+{
     motor_l.Backward();
     motor_r.Backward();
 }
 
-void cmd_step_halt_handler() {
+void cmd_step_halt_handler()
+{
     motor_l.Off();
     motor_r.Off();
 }
+void cmd_scan_handler()
+{
+    if (scan.get())
+    {
+        Serial.print("Target:");
+        Serial.println(colornames[scan.target]);
+        Serial.print("Seq:");
+        for (int i = 0; i < COLOR_SEQ_COUNT; i++)
+        {
+            Serial.print(colornames[scan.seq[i]]);
+            Serial.print(",");
+        }
+        Serial.println();
+    }
+}
 
-void act_grab_handler() {
-    servo_neck.SetAngle(SERVO_NECK_MID,30);
+void act_grab_handler()
+{
+    servo_neck.SetAngle(SERVO_NECK_MID, 30);
     servo_tong.TurnMax();
     servo_cleave.TurnMin();
     servo_tong.TurnMin();
@@ -153,57 +195,56 @@ void act_grab_handler() {
     servo_neck.TurnMin();
 }
 
-//爬台阶命令,前轮到台阶就可以点,尽量靠右一点
-void act_climb_handler() {
+// 爬台阶命令,前轮到台阶就可以点,尽量靠右一点
+void act_climb_handler()
+{
     servo_neck.TurnMin();
-    
-    //第一个台阶
+
+    // 第一个台阶
     motor_l.Forward();
     motor_r.Forward();
-    delay(250);  // 这个时间要够短，前轮刚好上去就行
+    delay(250); // 这个时间要够短，前轮刚好上去就行
     motor_l.Off();
     motor_r.Off();
 
     servo_cleave.SetAngle(SERVO_CLEAVE_CLIMB);
     motor_l.Forward();
     motor_r.Forward();
-    delay(550); //这里也要短一点，不要影响下一个台阶
+    delay(550); // 这里也要短一点，不要影响下一个台阶
     motor_l.Off();
     motor_r.Off();
 
     servo_cleave.TurnMax();
 
-    //第二个台阶
+    // 第二个台阶
     motor_l.Forward();
     motor_r.Forward();
-    delay(850);  // 这个时间要够短，前轮刚好上去就行
+    delay(850); // 这个时间要够短，前轮刚好上去就行
     motor_l.Off();
     motor_r.Off();
 
     servo_cleave.SetAngle(SERVO_CLEAVE_CLIMB);
     motor_l.Forward();
     motor_r.Forward();
-    delay(550); //这里也要短一点，不要影响下一个台阶
+    delay(550); // 这里也要短一点，不要影响下一个台阶
     motor_l.Off();
     motor_r.Off();
 
-    //到此为止,已经爬过了两个台阶
+    // 到此为止,已经爬过了两个台阶
 
-    //下台阶
+    // 下台阶
     motor_l.Forward();
     motor_r.Forward();
     delay(600);
     motor_l.Brake();
     motor_r.Brake();
-    delay(400);//等稳定
-    
-    act_safe_cleave_up_handler();
+    delay(400); // 等稳定
 
-    
+    act_safe_cleave_up_handler();
 }
 void act_safe_cleave_up_handler()
 {
-    servo_neck.SetAngle(SERVO_NECK_MID,30);
+    servo_neck.SetAngle(SERVO_NECK_MID, 30);
     servo_cleave.TurnMax();
     servo_neck.TurnMin();
 }
@@ -217,11 +258,11 @@ void act_dont_die_handler()
     motor_l.Off();
     motor_r.Off();
 
-    servo_neck.SetAngle(SERVO_NECK_MID,30);
+    servo_neck.SetAngle(SERVO_NECK_MID, 30);
 
     servo_cleave.TurnMax();
 
-    servo_neck.TurnMin();//最后朝前
+    servo_neck.TurnMin(); // 最后朝前
 }
 }
 HeraCross::Commands commands;

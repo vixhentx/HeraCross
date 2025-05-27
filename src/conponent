@@ -2,7 +2,7 @@
 #include "config"
 #include "motor"
 #include "servo"
-
+#include "scan"
 
 
 HeraCross::Motor motor_l(MOTOR_LN_PIN,MOTOR_LP_PIN);
@@ -12,6 +12,7 @@ HeraCross::DutyServo servo_tong(SERVO_TONG_PIN,SERVO_TONG_MAX,SERVO_TONG_MIN);
 HeraCross::PulseServo servo_cleave(SERVO_CLEAVE_PIN,SERVO_CLEAVE_MAX,SERVO_CLEAVE_MIN);
 HeraCross::PulseServo servo_neck(SERVO_NECK_PIN,SERVO_NECK_MAX,SERVO_NECK_MIN);
 
+HeraCross::Scan scan(SCAN_RX,SCAN_TX);
 
 
 void tick()

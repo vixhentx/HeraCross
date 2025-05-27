@@ -2,6 +2,13 @@
 
 /*
 ////////////////////
+/  Debug Config
+////////////////////
+*/
+#define DEBUG_MODE_VIX 1
+
+/*
+////////////////////
 /  Pin definition
 ////////////////////
 */
@@ -10,12 +17,14 @@
 #define MOTOR_RN_PIN 5
 #define MOTOR_RP_PIN 6
 
-//ATTENTION! ONLY pin 3,5,6,9,10 has PWM
+//ATTENTION! 只有 pin 3,5,6,9,10 has PWM
 #define SERVO_TONG_PIN 3
 #define SERVO_CLEAVE_PIN 7 
 #define SERVO_NECK_PIN 4
 
-#define BLE_RX 0
+//相对于板子的RX,TX
+#define SCAN_RX A0
+#define SCAN_TX A1
 
 /*
 ////////////////////
@@ -42,6 +51,8 @@
 */
 #define CMD_MAX_COUNT 100
 
+#define CMD_TEST 3
+
 #define CMD_MOTOR_L_F 11
 #define CMD_MOTOR_L_B 12
 #define CMD_MOTOR_L_HALT 13
@@ -65,6 +76,8 @@
 #define CMD_STEP_B 52
 #define CMD_STEP_HALT 53
 
+#define CMD_SCAN 60
+
 #define ACT_GRAB 80
 #define ACT_CLIMB 81
 #define ACT_SAFE_CLEAVE_UP 82
@@ -72,8 +85,39 @@
 
 /*
 ////////////////////
+/  Color Config
+////////////////////
+*/
+enum Color {
+    COLOR_NONE=0,
+    COLOR_RED=1,
+    COLOR_GREEN=2,
+    COLOR_BLUE=3
+};
+const char* colornames[]={"None","Red","Green","Blue"};
+
+#define COLOR_SEQ_COUNT 3
+#define COLOR_BUF_SIZE 20
+#define COLOR_SAMPLE_SIZE 6
+
+/*
+////////////////////
 /  Utils Config
 ////////////////////
 */
+#define SHORT_TIMEOUT 10000
+#define LONG_TIMEOUT  1000000
 #define REG_CMD(A,B) cmd_table[A]=B
 #define REP(X) for(int __REP_INNER_I__=0;__REP_INNER_I__<X;__REP_INNER_I__++)
+#define WHILE(X,TIMEOUT) for(int __WHILE_INNER_I__=0;(X)&&__WHILE_INNER_I__<TIMEOUT;__WHILE_INNER_I__++)
+#define ISIZE(X) ((int)sizeof(X))
+#if DEBUG_MODE_VIX == 1
+#define TRACE(X) Serial.println(X)
+#define TRACEV(X) Serial.print(X)
+#define TRACESV(S,X) Serial.print(S);Serial.print(": ");Serial.println(X)
+#else
+#define TRACE(X)
+#define TRACEV(X)
+#define TRACEV(S,X)
+#endif
+
