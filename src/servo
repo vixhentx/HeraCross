@@ -18,7 +18,7 @@ class PulseServo
         minAngle=_minAngle;
         digitalWrite(pin,0);
     }
-    virtual void SetPulse(int pulse)
+    void SetPulse(int pulse)
     {
         if(micros()<time_until)delayMicroseconds(time_until-micros());
         digitalWrite(pin,1);
@@ -28,7 +28,13 @@ class PulseServo
     }
     void SetPulse(int pulse,int rep)
     {
-        while(rep--)SetPulse(pulse);
+        while(rep--)
+        {
+            digitalWrite(pin,1);
+            delayMicroseconds(pulse);
+            digitalWrite(pin,0);
+            delay(20-pulse/1000);
+        }
     }
     void SetAngle(int angle)
     {
@@ -36,15 +42,23 @@ class PulseServo
     }
     void SetAngle(int angle,int rep)
     {
-        while(rep--)SetAngle(angle);
+        SetAngle(angle,rep);
     }
     void TurnMax()
     {
         SetAngle(maxAngle);
     }
+    void TurnMax(int rep)
+    {
+        SetAngle(maxAngle,rep);
+    }
     void TurnMin()
     {
         SetAngle(minAngle);
+    }
+    void TurnMin(int rep)
+    {
+        SetAngle(minAngle,rep);
     }
 };
 class DutyServo 
