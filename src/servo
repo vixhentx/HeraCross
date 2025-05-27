@@ -9,6 +9,7 @@ class PulseServo
 {
     private:
     int pin,maxAngle,minAngle,pulse_width;
+    unsigned long time_until=0;
     public:
     PulseServo(int _pin,int _maxAngle, int _minAngle)
     {
@@ -19,11 +20,11 @@ class PulseServo
     }
     virtual void SetPulse(int pulse)
     {
-        // pulse_width=pulse_in_100us;
+        if(micros()<time_until)delayMicroseconds(time_until-micros());
         digitalWrite(pin,1);
         delayMicroseconds(pulse);
         digitalWrite(pin,0);
-        delay(20-pulse_width/1000);
+        time_until=micros()+pulse;//直接存储剩下需要delay的毫秒数，不使用delay阻塞
     }
     void SetPulse(int pulse,int rep)
     {
