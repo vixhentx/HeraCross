@@ -42,7 +42,7 @@ class PulseServo
     }
     void SetAngle(int angle,int rep)
     {
-        SetAngle(angle,rep);
+        SetPulse(((angle*11)+500),rep);
     }
     void TurnMax()
     {
