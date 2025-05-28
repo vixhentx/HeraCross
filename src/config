@@ -12,10 +12,10 @@
 /  Pin definition
 ////////////////////
 */
-#define MOTOR_LN_PIN 9
-#define MOTOR_LP_PIN 10
-#define MOTOR_RN_PIN 5
-#define MOTOR_RP_PIN 6
+#define MOTOR_LN_PIN 5
+#define MOTOR_LP_PIN 6
+#define MOTOR_RN_PIN 9
+#define MOTOR_RP_PIN 10
 
 //ATTENTION! 只有 pin 3,5,6,9,10 has PWM
 #define SERVO_TONG_PIN 3
@@ -25,6 +25,14 @@
 //相对于板子的RX,TX
 #define SCAN_RX A0
 #define SCAN_TX A1
+
+/*
+////////////////////
+/  Motor Config
+////////////////////
+*/
+#define MOTOR_L_PULSE 243
+#define MOTOR_R_PULSE 255
 
 /*
 ////////////////////

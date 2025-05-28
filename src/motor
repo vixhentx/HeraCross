@@ -6,19 +6,43 @@ namespace HeraCross
 class Motor
 {
     private:
-    int pinN,pinP;
+    int pinN,pinP,fPulse;
     public:
-    Motor(int _pinN, int _pinP)
+    Motor(int _pinN, int _pinP, int _fPulse=255)
     {
         pinN=_pinN;
         pinP=_pinP;
+        fPulse=_fPulse;
+        
+    }
+    //设定电机转动的速度，pulse: -255~0~255
+    void SetPulse(int pulse)
+    {
+        if(pulse>=0)
+        {
+            analogWrite(pinP,pulse);
+            digitalWrite(pinN,0);
+        }
+        else
+        {
+            analogWrite(pinN,-pulse);
+            digitalWrite(pinP,0);
+        }
     }
     void Forward()
+    {
+        SetPulse(fPulse);
+    }
+    void Backward()
+    {
+        SetPulse(-fPulse);
+    }
+    void ForwardFullSpeed()
     {
         digitalWrite(pinN,0);
         digitalWrite(pinP,1);
     }
-    void Backward()
+    void BackwardFullSpeed()
     {
         digitalWrite(pinN,1);
         digitalWrite(pinP,0);

@@ -5,8 +5,8 @@
 #include "scan"
 
 
-HeraCross::Motor motor_l(MOTOR_LN_PIN,MOTOR_LP_PIN);
-HeraCross::Motor motor_r(MOTOR_RN_PIN,MOTOR_RP_PIN);
+HeraCross::Motor motor_l(MOTOR_LN_PIN,MOTOR_LP_PIN,MOTOR_L_PULSE);
+HeraCross::Motor motor_r(MOTOR_RN_PIN,MOTOR_RP_PIN,MOTOR_R_PULSE);
 
 HeraCross::DutyServo servo_tong(SERVO_TONG_PIN,SERVO_TONG_MAX,SERVO_TONG_MIN);
 HeraCross::PulseServo servo_cleave(SERVO_CLEAVE_PIN,SERVO_CLEAVE_MAX,SERVO_CLEAVE_MIN);
