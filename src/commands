@@ -4,8 +4,6 @@
 namespace HeraCross
 {
 typedef void (*cmd_handler_t)(void);
-
-void TryRun(int cmd);
 // 声明
 void cmd_test_handler();
 void cmd_motor_l_f_handler();
@@ -186,12 +184,14 @@ void cmd_scan_handler()
 
 void act_grab_handler()
 {
-    servo_neck.SetAngle(SERVO_NECK_MID, 30);
-    servo_tong.TurnMax();
+    servo_neck.SetAngle(SERVO_NECK_MID,2);
+    servo_tong.SetPulse(SERVO_TONG_GRAB);
     servo_cleave.TurnMin();
+    delay(1000);
     servo_tong.TurnMin();
-    delay(500);
+    delay(300);
     servo_cleave.TurnMax();
+    delay(200);
     servo_neck.TurnMin();
 }
 
@@ -207,10 +207,10 @@ void act_climb_handler()
     motor_l.Off();
     motor_r.Off();
 
-    servo_cleave.SetAngle(SERVO_CLEAVE_CLIMB);
+    servo_cleave.SetAngle(SERVO_CLEAVE_CLIMB,10);
     motor_l.Forward();
     motor_r.Forward();
-    delay(550); // 这里也要短一点，不要影响下一个台阶
+    delay(400); // 这里也要短一点，不要影响下一个台阶
     motor_l.Off();
     motor_r.Off();
 
@@ -219,14 +219,14 @@ void act_climb_handler()
     // 第二个台阶
     motor_l.Forward();
     motor_r.Forward();
-    delay(850); // 这个时间要够短，前轮刚好上去就行
+    delay(500); // 这个时间要够短，前轮刚好上去就行
     motor_l.Off();
     motor_r.Off();
 
-    servo_cleave.SetAngle(SERVO_CLEAVE_CLIMB);
+    servo_cleave.TurnMax();
     motor_l.Forward();
     motor_r.Forward();
-    delay(550); // 这里也要短一点，不要影响下一个台阶
+    delay(550);
     motor_l.Off();
     motor_r.Off();
 
@@ -235,12 +235,15 @@ void act_climb_handler()
     // 下台阶
     motor_l.Forward();
     motor_r.Forward();
-    delay(600);
-    motor_l.Brake();
-    motor_r.Brake();
-    delay(400); // 等稳定
+    delay(400);
+    // motor_l.Brake();
+    // motor_r.Brake();
+    // delay(400); // 等稳定
 
     act_safe_cleave_up_handler();
+
+    motor_l.Off();
+    motor_r.Off();
 }
 void act_safe_cleave_up_handler()
 {
