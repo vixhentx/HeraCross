@@ -1,0 +1,29 @@
+#pragma once
+
+#include "config"
+#include <Adafruit_SSD1306.h>
+
+namespace HeraCross
+{
+class Screen
+{
+    private:
+    ::Adafruit_SSD1306 oled = ::Adafruit_SSD1306(128, 64);
+    public:
+    Screen(const TwoWire& wire = Wire)
+    {
+        oled.begin(SSD1306_SWITCHCAPVCC, 0x3C, &wire);
+        oled.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+        oled.setTextColor(WHITE);
+        oled.setTextSize(1);
+        oled.setCursor(0, 0);
+        oled.drawChar(0,0,'A',WHITE,BLACK,1);
+        oled.display();
+    }
+    void ShowColor(Color color)
+    {
+        // oled.clearDisplay();
+        oled.drawChar(0,0,color + '0',WHITE,BLACK,1);
+    }
+};
+}
