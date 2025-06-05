@@ -4,11 +4,11 @@ id: cb2bf013-e105-461c-81cf-44dc79b06bab
 flowchart TD
 subgraph Main[HeraCross程序架构]
     subgraph Cfg[配置config]
-        DebugCfg[(调试配置)]
-        PinCfg[(引脚配置)]
-        MotorCfg[(直流电机配置)]
-        ServoCfg[(舵机配置)]
-        CommandCfg[(命令配置)]
+        DebugCfg[(调试配置)] ~~~
+        PinCfg[(引脚配置)] ~~~
+        MotorCfg[(直流电机配置)] ~~~
+        ServoCfg[(舵机配置)] ~~~
+        CommandCfg[(命令配置)] ~~~
         MiscCfg[(其他配置)]
     end
     subgraph Comp[组件Conponent]
@@ -27,10 +27,11 @@ subgraph Main[HeraCross程序架构]
         subgraph Screen[屏幕]
             screen((OLED显示屏))
         end
+        Motor ~~~ Servo ~~~ Scan ~~~ Screen 
     end
     subgraph Commands[命令Commands]
-        TryRun([执行器])
-        Command[直接控制各组件的Command]
+        TryRun([执行器]) ~~~
+        Command[直接控制各组件的Command] ~~~
         Act[各种命令的组合Act]
     end
 end
