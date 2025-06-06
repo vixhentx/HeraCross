@@ -59,6 +59,7 @@
 ////////////////////
 */
 #define CMD_MAX_COUNT 100
+#define LCMD_MAX_COUNT 5
 
 #define CMD_TEST 3
 
@@ -92,6 +93,11 @@
 #define ACT_SAFE_CLEAVE_UP 82
 #define ACT_DONT_DIE 83
 
+#define LCMD_IDENTIFIER 100
+
+#define LCMD_MOTOR_L 101
+#define LCMD_MOTOR_R 102
+
 /*
 ////////////////////
 /  Color Config
@@ -117,6 +123,7 @@ const char* colornames[]={"None","Red","Green","Blue"};
 #define SHORT_TIMEOUT 10000
 #define LONG_TIMEOUT  1000000
 #define REG_CMD(A,B) cmd_table[A]=B
+#define REG_LCMD(A,B) lcmd_table[A]=B
 #define REP(X) for(int __REP_INNER_I__=0;__REP_INNER_I__<X;__REP_INNER_I__++)
 #define WHILE(X,TIMEOUT) for(int __WHILE_INNER_I__=0;(X)&&__WHILE_INNER_I__<TIMEOUT;__WHILE_INNER_I__++)
 #define ISIZE(X) ((int)sizeof(X))

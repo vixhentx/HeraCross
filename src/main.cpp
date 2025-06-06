@@ -11,7 +11,7 @@ void setup()
     delay(100);
     screen.Init();
 }
-int cmd;
+long cmd;
 void loop()
 {
     cmd=Serial.parseInt();

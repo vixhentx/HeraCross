@@ -57,5 +57,9 @@ class Motor
         digitalWrite(pinN,1);
         digitalWrite(pinP,1);
     }
+    void Linear(int speed)
+    {
+        SetPulse(map(speed,-255,255,-fPulse,fPulse));
+    }
 };
 }

@@ -4,6 +4,7 @@
 namespace HeraCross
 {
 typedef void (*cmd_handler_t)(void);
+typedef void (*lcmd_handler_t)(int value);
 // 声明
 void cmd_test_handler();
 void cmd_motor_l_f_handler();
@@ -27,9 +28,12 @@ void act_grab_handler();
 void act_climb_handler();
 void act_safe_cleave_up_handler();
 void act_dont_die_handler();
+void lcmd_motor_l_handler(int value);
+void lcmd_motor_r_handler(int value);
 
 // 注册表
 cmd_handler_t cmd_table[CMD_MAX_COUNT];
+lcmd_handler_t lcmd_table[LCMD_MAX_COUNT];
 
 class Commands
 {
@@ -61,18 +65,38 @@ public:
         REG_CMD(ACT_CLIMB, act_climb_handler);
         REG_CMD(ACT_SAFE_CLEAVE_UP, act_safe_cleave_up_handler);
         REG_CMD(ACT_DONT_DIE, act_dont_die_handler);
+
+        REG_LCMD(LCMD_MOTOR_L, lcmd_motor_l_handler);
+        REG_LCMD(LCMD_MOTOR_R, lcmd_motor_r_handler);
     }
-    void TryRun(int cmd)
+    void TryRun(long cmd)
     {
-        if (cmd_table[cmd] != nullptr)
+        if(cmd<LCMD_IDENTIFIER)
         {
-            cmd_table[cmd]();
-            Serial.print("CMD_SUC_ID:");
-            Serial.println(runned_count++);
+            if (cmd_table[cmd] != nullptr)
+            {
+                cmd_table[cmd]();
+                Serial.print("CMD_SUC_ID:");
+                Serial.println(runned_count++);
+            }
+            else
+            {
+                Serial.println("CMD_FAIL");
+            }
         }
-        else
+        else// 101_255
         {
-            Serial.println("CMD_FAIL");
+            int lcmd = cmd / 100,para = cmd % 100 - 255;
+            if (lcmd_table[lcmd] != nullptr)
+            {
+                lcmd_table[lcmd](para);
+                Serial.print("LCMD_SUC_ID:");
+                Serial.println(runned_count++);
+            }
+            else
+            {
+                Serial.println("LCMD_FAIL");
+            }
         }
     }
 };
@@ -190,7 +214,7 @@ void act_grab_handler()
     servo_cleave.TurnMin();
     delay(1000);
     servo_tong.TurnMin();
-    delay(300);
+    delay(400);
     servo_cleave.TurnMax();
     delay(200);
     servo_neck.TurnMin();
@@ -268,5 +292,14 @@ void act_dont_die_handler()
 
     servo_neck.TurnMin(); // 最后朝前
 }
+void lcmd_motor_l_handler(int value)
+{
+    motor_l.Linear(value);
 }
+void lcmd_motor_r_handler(int value)
+{
+    motor_r.Linear(value);
+}
+}
+
 HeraCross::Commands commands;
