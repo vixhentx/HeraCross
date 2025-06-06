@@ -179,6 +179,7 @@ void cmd_scan_handler()
             Serial.print(",");
         }
         Serial.println();
+        screen.ShowColor(scan.target, scan.seq);
     }
 }
 

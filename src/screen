@@ -1,29 +1,43 @@
 #pragma once
 
 #include "config"
-#include <Adafruit_SSD1306.h>
+#include <U8g2lib.h>
 
 namespace HeraCross
 {
+static const char* color_text[]={"None","Red","Green","Blue"};
 class Screen
 {
     private:
-    ::Adafruit_SSD1306 oled = ::Adafruit_SSD1306(128, 64);
+    U8X8_SSD1306_128X64_NONAME_HW_I2C* u8x8;
     public:
-    Screen(const TwoWire& wire = Wire)
+    void Init()
     {
-        oled.begin(SSD1306_SWITCHCAPVCC, 0x3C, &wire);
-        oled.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-        oled.setTextColor(WHITE);
-        oled.setTextSize(1);
-        oled.setCursor(0, 0);
-        oled.drawChar(0,0,'A',WHITE,BLACK,1);
-        oled.display();
+        u8x8 = new U8X8_SSD1306_128X64_NONAME_HW_I2C(SCL,SDA,U8X8_PIN_NONE);
+        u8x8->begin();
+        u8x8->setFont(u8x8_font_courB18_2x3_f);
+        u8x8->clearDisplay();
+        u8x8->drawString(0,0,"Hera");
+        u8x8->drawString(4,20,"Cross");
+        u8x8->refreshDisplay();
     }
-    void ShowColor(Color color)
+
+    void ShowText(int line, int column, String text)
     {
-        // oled.clearDisplay();
-        oled.drawChar(0,0,color + '0',WHITE,BLACK,1);
+        u8x8->clearDisplay();
+        u8x8->drawString(line, column, text.c_str());
+        u8x8->refreshDisplay();
+    }
+    void ShowColor(Color target,Color seq[])
+    {
+        u8x8->clearDisplay();
+        u8x8->setFont(u8x8_font_courB18_2x3_f);
+        u8x8->drawString(0,0,color_text[target]);
+        char tmp[16];
+        sprintf(tmp,"%s,%s,%s",color_text[seq[0]],color_text[seq[1]],color_text[seq[2]]);
+        u8x8->setFont(u8x8_font_7x14_1x2_f);
+        u8x8->drawString(0,20,tmp);
+        u8x8->refreshDisplay();
     }
 };
 }
