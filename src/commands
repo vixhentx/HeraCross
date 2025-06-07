@@ -86,9 +86,12 @@ public:
         }
         else// 101_255
         {
-            int lcmd = cmd / 100,para = cmd % 100 - 255;
+            int lcmd = cmd / 1000,para = (cmd % 1000) - 255;
             if (lcmd_table[lcmd] != nullptr)
             {
+                TRACESV("REC:",cmd);
+                TRACESV("LCMD_ID:",lcmd);
+                TRACESV("LCMD_PARA:",para);
                 lcmd_table[lcmd](para);
                 Serial.print("LCMD_SUC_ID:");
                 Serial.println(runned_count++);
