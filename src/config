@@ -31,8 +31,8 @@
 /  Motor Config
 ////////////////////
 */
-#define MOTOR_L_PULSE 243
-#define MOTOR_R_PULSE 255
+#define MOTOR_L_PULSE 255
+#define MOTOR_R_PULSE 248
 
 /*
 ////////////////////
@@ -41,9 +41,12 @@
 */
 #define SERVO_COUNT 3
 
-#define SERVO_TONG_MIN 102
+#define SERVO_TONG_MIN 90
 #define SERVO_TONG_MAX 210
 #define SERVO_TONG_GRAB 170
+// #define SERVO_TONG_MIN 0
+// #define SERVO_TONG_MAX 180
+// #define SERVO_TONG_GRAB 90
 
 #define SERVO_CLEAVE_MIN 0
 #define SERVO_CLEAVE_MAX 110

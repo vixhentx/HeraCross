@@ -76,12 +76,11 @@ public:
             if (cmd_table[cmd] != nullptr)
             {
                 cmd_table[cmd]();
-                Serial.print("CMD_SUC_ID:");
-                Serial.println(runned_count++);
+                TRACESV("CMD_SUC_ID",runned_count++);
             }
             else
             {
-                Serial.println("CMD_FAIL");
+                TRACE("CMD_FAIL");
             }
         }
         else// 101_255
@@ -89,16 +88,16 @@ public:
             int lcmd = cmd / 1000,para = (cmd % 1000) - 255;
             if (lcmd_table[lcmd] != nullptr)
             {
-                TRACESV("REC:",cmd);
-                TRACESV("LCMD_ID:",lcmd);
-                TRACESV("LCMD_PARA:",para);
+                TRACESV("REC",cmd);
+                TRACESV("LCMD_ID",lcmd);
+                TRACESV("LCMD_PARA",para);
                 lcmd_table[lcmd](para);
-                Serial.print("LCMD_SUC_ID:");
-                Serial.println(runned_count++);
+                TRACEV("LCMD_SUC_ID");
+                TRACE(runned_count++);
             }
             else
             {
-                Serial.println("LCMD_FAIL");
+                TRACE("LCMD_FAIL");
             }
         }
     }
@@ -277,7 +276,7 @@ void act_safe_cleave_up_handler()
 {
     servo_neck.SetAngle(SERVO_NECK_MID, 30);
     servo_cleave.TurnMax();
-    servo_neck.TurnMin();
+    servo_neck.TurnMax();
 }
 void act_dont_die_handler()
 {
@@ -293,7 +292,7 @@ void act_dont_die_handler()
 
     servo_cleave.TurnMax();
 
-    servo_neck.TurnMin(); // 最后朝前
+    servo_neck.TurnMax(); // 最后朝后
 }
 void lcmd_motor_l_handler(int value)
 {
