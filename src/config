@@ -137,6 +137,6 @@ const char* colornames[]={"None","Red","Green","Blue"};
 #else
 #define TRACE(X)
 #define TRACEV(X)
-#define TRACEV(S,X)
+#define TRACESV(S,X)
 #endif
 
