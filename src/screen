@@ -1,18 +1,29 @@
 #pragma once
 
-#include "config"
+#include "config"  
+
+#ifdef SCREEN_ON
 #include <U8g2lib.h>
+#else
+#include <Arduino.h>
+#endif
+
 
 namespace HeraCross
 {
+#ifdef SCREEN_ON
 static const char* color_text[]={"None","Red","Green","Blue"};
+#endif
 class Screen
 {
     private:
+    #ifdef SCREEN_ON
     U8X8_SSD1306_128X64_NONAME_HW_I2C* u8x8;
+    #endif
     public:
     void Init()
     {
+        #ifdef SCREEN_ON
         u8x8 = new U8X8_SSD1306_128X64_NONAME_HW_I2C(SCL,SDA,U8X8_PIN_NONE);
         u8x8->begin();
         u8x8->setFlipMode(2);
@@ -21,16 +32,20 @@ class Screen
         u8x8->drawString(0,0,"Hera");
         u8x8->drawString(4,20,"Cross");
         u8x8->refreshDisplay();
+        #endif
     }
 
     void ShowText(int line, int column, String text)
     {
+        #ifdef SCREEN_ON
         u8x8->clearDisplay();
         u8x8->drawString(line, column, text.c_str());
         u8x8->refreshDisplay();
+        #endif
     }
     void ShowColor(Color target,Color seq[])
     {
+        #ifdef SCREEN_ON
         u8x8->clearDisplay();
         u8x8->setFont(u8x8_font_courB18_2x3_f);
         u8x8->drawString(0,0,color_text[target]);
@@ -39,6 +54,7 @@ class Screen
         u8x8->setFont(u8x8_font_7x14_1x2_f);
         u8x8->drawString(0,20,tmp);
         u8x8->refreshDisplay();
+        #endif
     }
 };
 }
