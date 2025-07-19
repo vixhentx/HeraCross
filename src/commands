@@ -1,4 +1,6 @@
 #pragma once
+#include "Arduino.h"
+#include "config"
 #include "conponent"
 
 namespace HeraCross
@@ -86,7 +88,7 @@ public:
         else// 101_255
         {
             int lcmd = cmd / 1000,para = (cmd % 1000) - 255;
-            if (lcmd_table[lcmd] != nullptr)
+            if (lcmd_table[lcmd-LCMD_IDENTIFIER] != nullptr)
             {
                 TRACESV("REC",cmd);
                 TRACESV("LCMD_ID",lcmd);
@@ -213,7 +215,7 @@ void act_grab_handler()
 {
     servo_neck.SetAngle(SERVO_NECK_MID,2);
     servo_tong.SetPulse(SERVO_TONG_GRAB);
-    servo_cleave.TurnMin();
+    servo_cleave.SetAngle(SERVO_CLEAVE_GRAB,2);
     delay(1000);
     servo_tong.TurnMin();
     delay(400);
@@ -274,8 +276,10 @@ void act_climb_handler()
 }
 void act_safe_cleave_up_handler()
 {
-    servo_neck.SetAngle(SERVO_NECK_MID, 30);
+    servo_neck.SetAngle(SERVO_NECK_MID);
+    delay(800);
     servo_cleave.TurnMax();
+    delay(700);
     servo_neck.TurnMax();
 }
 void act_dont_die_handler()

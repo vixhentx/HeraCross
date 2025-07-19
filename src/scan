@@ -63,9 +63,10 @@ class Scan
             int t=i;
             for(i=0;i<t;i++)
             {
-                TRACE((uint8_t)buf[i]);
-                TRACE(" ");
+                TRACEV((uint8_t)buf[i]);
+                TRACEV(" ");
             }
+            TRACE();
             return false;
         }
         TRACE("scan result received");

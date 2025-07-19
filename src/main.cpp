@@ -8,7 +8,8 @@ void setup()
 {
     delay(100);
     Serial.begin(9600);
-    delay(100);
+    TRACE("Hello World!");
+    delay(1000);
     screen.Init();
 }
 long cmd;
