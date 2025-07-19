@@ -6,7 +6,7 @@
 ////////////////////
 */
 #define DEBUG_MODE 1
-#define SCREEN_ON 1
+// #define SCREEN_ON 1
 
 /*
 ////////////////////
@@ -60,45 +60,9 @@
 /  Command Config
 ////////////////////
 */
-#define CMD_MAX_COUNT 100
-#define LCMD_MAX_COUNT 5
-
-#define CMD_TEST 3
-
-#define CMD_MOTOR_L_F 11
-#define CMD_MOTOR_L_B 12
-#define CMD_MOTOR_L_HALT 13
-
-#define CMD_MOTOR_R_F 15
-#define CMD_MOTOR_R_B 16
-#define CMD_MOTOR_R_HALT 17
-
-#define CMD_TONG_OFF 20
-#define CMD_TONG_ON 21
-
-#define CMD_NECK_OFF 22
-#define CMD_NECK_ON 23
-#define CMD_NECK_MID 24
-
-#define CMD_CLEAVE_OFF 25
-#define CMD_CLEAVE_ON 26
-
-
-#define CMD_STEP_F 51
-#define CMD_STEP_B 52
-#define CMD_STEP_HALT 53
-
-#define CMD_SCAN 60
-
-#define ACT_GRAB 80
-#define ACT_CLIMB 81
-#define ACT_SAFE_CLEAVE_UP 82
-#define ACT_DONT_DIE 83
-
-#define LCMD_IDENTIFIER 100
-
-#define LCMD_MOTOR_L 101
-#define LCMD_MOTOR_R 102
+#define CMD_NAME_SIZE 3
+#define CMD_ARG_SIZE 3
+#define CMD_MAX_COUNT 25
 
 /*
 ////////////////////
@@ -137,5 +101,6 @@ const char* colornames[]={"None","Red","Green","Blue"};
 #define TRACE(X)
 #define TRACEV(X)
 #define TRACESV(S,X)
+#define assert(__e)
 #endif
 

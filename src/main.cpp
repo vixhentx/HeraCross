@@ -12,13 +12,9 @@ void setup()
     delay(1000);
     screen.Init();
 }
-long cmd;
 void loop()
 {
-    cmd=Serial.parseInt();
-    if(cmd)
-    {
+    auto cmd=Serial.readString();
+    if(cmd.length()>0)
         commands.TryRun(cmd);
-    }
-    cmd=0;
 }

@@ -1,311 +1,338 @@
 #pragma once
-#include "Arduino.h"
+#include <Arduino.h>
 #include "config"
 #include "conponent"
+#include "servo"
 
 namespace HeraCross
 {
-typedef void (*cmd_handler_t)(void);
-typedef void (*lcmd_handler_t)(int value);
-// 声明
-void cmd_test_handler();
-void cmd_motor_l_f_handler();
-void cmd_motor_l_b_handler();
-void cmd_motor_l_halt_handler();
-void cmd_motor_r_f_handler();
-void cmd_motor_r_b_handler();
-void cmd_motor_r_halt_handler();
-void cmd_tong_off_handler();
-void cmd_tong_on_handler();
-void cmd_neck_off_handler();
-void cmd_neck_on_handler();
-void cmd_neck_mid_handler();
-void cmd_cleave_off_handler();
-void cmd_cleave_on_handler();
-void cmd_step_f_handler();
-void cmd_step_b_handler();
-void cmd_step_halt_handler();
-void cmd_scan_handler();
-void act_grab_handler();
-void act_climb_handler();
-void act_safe_cleave_up_handler();
-void act_dont_die_handler();
-void lcmd_motor_l_handler(int value);
-void lcmd_motor_r_handler(int value);
-
-// 注册表
-cmd_handler_t cmd_table[CMD_MAX_COUNT];
-lcmd_handler_t lcmd_table[LCMD_MAX_COUNT];
-
-class Commands
+struct CommandFunction
 {
-private:
-    int runned_count = 0;
-
-public:
-    Commands()
+    using signature = bool(const int, String* const);
+    const String _name;
+    const int _argc;
+    signature* const _func;
+};
+class CommandEngine
+{
+    private:
+    CommandFunction *_table;
+    int _cmd_count;
+    public:
+    CommandEngine(CommandFunction *table,int cmd_count) : _table(table), _cmd_count(cmd_count){}
+    void TryRun(const String& raw_cmd)
     {
-        REG_CMD(CMD_TEST, cmd_test_handler);
-        REG_CMD(CMD_MOTOR_L_F, cmd_motor_l_f_handler);
-        REG_CMD(CMD_MOTOR_L_B, cmd_motor_l_b_handler);
-        REG_CMD(CMD_MOTOR_L_HALT, cmd_motor_l_halt_handler);
-        REG_CMD(CMD_MOTOR_R_F, cmd_motor_r_f_handler);
-        REG_CMD(CMD_MOTOR_R_B, cmd_motor_r_b_handler);
-        REG_CMD(CMD_MOTOR_R_HALT, cmd_motor_r_halt_handler);
-        REG_CMD(CMD_TONG_OFF, cmd_tong_off_handler);
-        REG_CMD(CMD_TONG_ON, cmd_tong_on_handler);
-        REG_CMD(CMD_NECK_OFF, cmd_neck_off_handler);
-        REG_CMD(CMD_NECK_ON, cmd_neck_on_handler);
-        REG_CMD(CMD_NECK_MID, cmd_neck_mid_handler);
-        REG_CMD(CMD_CLEAVE_OFF, cmd_cleave_off_handler);
-        REG_CMD(CMD_CLEAVE_ON, cmd_cleave_on_handler);
-        REG_CMD(CMD_STEP_F, cmd_step_f_handler);
-        REG_CMD(CMD_STEP_B, cmd_step_b_handler);
-        REG_CMD(CMD_STEP_HALT, cmd_step_halt_handler);
-        REG_CMD(CMD_SCAN, cmd_scan_handler);
-        REG_CMD(ACT_GRAB, act_grab_handler);
-        REG_CMD(ACT_CLIMB, act_climb_handler);
-        REG_CMD(ACT_SAFE_CLEAVE_UP, act_safe_cleave_up_handler);
-        REG_CMD(ACT_DONT_DIE, act_dont_die_handler);
-
-        REG_LCMD(LCMD_MOTOR_L, lcmd_motor_l_handler);
-        REG_LCMD(LCMD_MOTOR_R, lcmd_motor_r_handler);
-    }
-    void TryRun(long cmd)
-    {
-        if(cmd<LCMD_IDENTIFIER)
+        //Spilt
+        String args[CMD_ARG_SIZE];
+        int args_len = 0;
+        if(raw_cmd.length() > 0)
         {
-            if (cmd_table[cmd] != nullptr)
+            int w = 0, i = 0;
+            do
             {
-                cmd_table[cmd]();
-                TRACESV("CMD_SUC_ID",runned_count++);
+                if(raw_cmd[i]!=' ')i++;
+                else
+                {
+                    args[args_len++] = raw_cmd.substring(w,i);
+                    w=i+1;
+                    i+=2;
+                }
+            }while(i<raw_cmd.length());
+            args[args_len++] = raw_cmd.substring(w,i-1);
+        }
+
+        //Find
+        unsigned int l=0,r=_cmd_count;
+        while(l<r)
+        {
+            unsigned int mid = (l+r) >> 1;
+            if(_table[mid]._name < args[0]) l = mid + 1;
+            else r=mid;
+        }
+        //Execute
+        if(l<_cmd_count && _table[l]._name==args[0])
+        {
+            if(_table[l]._argc==args_len-1)
+            {
+                bool ret = _table[l]._func(args_len-1,args+1);
+                if(ret)
+                {
+                    TRACESV("Command executed", args[0]);
+                }
+                else 
+                {
+                    TRACESV("Command failed", args[0]);
+                }
             }
             else
             {
-                TRACE("CMD_FAIL");
+                TRACESV("Wrong number of arguments", args[0]);
             }
         }
-        else// 101_255
+        else 
         {
-            int lcmd = cmd / 1000,para = (cmd % 1000) - 255;
-            if (lcmd_table[lcmd-LCMD_IDENTIFIER] != nullptr)
-            {
-                TRACESV("REC",cmd);
-                TRACESV("LCMD_ID",lcmd);
-                TRACESV("LCMD_PARA",para);
-                lcmd_table[lcmd](para);
-                TRACEV("LCMD_SUC_ID");
-                TRACE(runned_count++);
-            }
-            else
-            {
-                TRACE("LCMD_FAIL");
-            }
+            TRACESV("Unknown command: " , args[0]);
         }
     }
 };
 
-// 实现
 
-void cmd_test_handler()
+class Commands : public CommandEngine
 {
-    scan.test();
-}
+public:
+    using arg_list = String*;
+    const static CommandFunction cmd_table[];
+    const static int cmd_count;
 
-void cmd_tong_off_handler()
-{
-    servo_tong.TurnMin();
-}
+    Commands() : CommandEngine(cmd_table,cmd_count) {}
 
-void cmd_tong_on_handler()
-{
-    servo_tong.TurnMax();
-}
-
-void cmd_neck_off_handler()
-{
-    servo_neck.TurnMin();
-}
-
-void cmd_neck_on_handler()
-{
-    servo_neck.TurnMax();
-}
-
-void cmd_neck_mid_handler()
-{
-    servo_neck.SetAngle(SERVO_NECK_MID);
-}
-
-void cmd_cleave_off_handler()
-{
-    servo_cleave.TurnMin();
-}
-
-void cmd_cleave_on_handler()
-{
-    servo_cleave.TurnMax();
-}
-
-void cmd_motor_l_f_handler()
-{
-    motor_l.Forward();
-}
-
-void cmd_motor_l_b_handler()
-{
-    motor_l.Backward();
-}
-
-void cmd_motor_l_halt_handler()
-{
-    motor_l.Off();
-}
-
-void cmd_motor_r_f_handler()
-{
-    motor_r.Forward();
-}
-
-void cmd_motor_r_b_handler()
-{
-    motor_r.Backward();
-}
-
-void cmd_motor_r_halt_handler()
-{
-    motor_r.Off();
-}
-
-void cmd_step_f_handler()
-{
-    motor_l.Forward();
-    motor_r.Forward();
-}
-
-void cmd_step_b_handler()
-{
-    motor_l.Backward();
-    motor_r.Backward();
-}
-
-void cmd_step_halt_handler()
-{
-    motor_l.Off();
-    motor_r.Off();
-}
-void cmd_scan_handler()
-{
-    if (scan.get())
+    //tgd: Tong on/off/grab
+    static bool tong_digital(const int argc,const arg_list argv)
     {
-        Serial.print("Target:");
-        Serial.println(colornames[scan.target]);
-        Serial.print("Seq:");
-        for (int i = 0; i < COLOR_SEQ_COUNT; i++)
+        auto& arg = argv[0];
+        if (arg == "on")
         {
-            Serial.print(colornames[scan.seq[i]]);
-            Serial.print(",");
+            servo_tong.TurnMax();
         }
-        Serial.println();
-        screen.ShowColor(scan.target, scan.seq);
+        else if (arg == "off")
+        {
+            servo_tong.TurnMin();
+        }
+        else if (arg == "grab")
+        {
+            servo_tong.SetPulse(SERVO_TONG_GRAB);
+        }
+        else return false;
+
+        return true;
     }
+    //nkd: Neck on/off
+    static bool neck_digital(const int argc,const arg_list argv)
+    {
+        auto& arg = argv[0];
+        if (arg == "on")
+        {
+            servo_neck.TurnMax();
+        }
+        else if (arg == "off")
+        {
+            servo_neck.TurnMin();
+        }
+        else return false;
+
+        return true;
+    }
+    //cld: Cleave on/off
+    static bool cleave_digital(const int argc,const arg_list argv)
+    {
+        auto& arg = argv[0];
+        if (arg == "on")
+        {
+            servo_cleave.TurnMax();
+        }
+        else if (arg == "off")
+        {
+            servo_cleave.TurnMin();
+        }
+        else if (arg == "clm")
+        {
+            servo_cleave.SetAngle(SERVO_CLEAVE_CLIMB);
+        }
+        else if (arg == "grb")
+        {
+            servo_cleave.SetAngle(SERVO_CLEAVE_GRAB);
+        }
+        else return false;
+
+        return true;
+    }
+    //mld: Motor left foward/backward/off/brake
+    static bool motor_l_digital(const int argc,const arg_list argv)
+    {
+        return motor_digital(motor_l, argc, argv);
+    }
+    //mrd: Motor right foward/backward/off/brake
+    static bool motor_r_digital(const int argc,const arg_list argv)
+    {
+        return motor_digital(motor_r, argc, argv);
+    }
+    //msd: Motor step forward/backward/off/brake
+    static bool motor_step_digital(const int argc,const arg_list argv)
+    {
+        return motor_digital(motor_l,argc,argv) && motor_digital(motor_r,argc,argv);
+    }
+    //scn: Scaner scan action
+    static bool scan(const int argc,const arg_list argv)
+    {
+        if (scanner.get())
+        {
+            Serial.print("Target:");
+            Serial.println(colornames[scanner.target]);
+            Serial.print("Seq:");
+            for (int i = 0; i < COLOR_SEQ_COUNT; i++)
+            {
+                Serial.print(colornames[scanner.seq[i]]);
+                Serial.print(",");
+            }
+            Serial.println();
+            screen.ShowColor(scanner.target, scanner.seq);
+            return true;
+        }
+        return false;
+    }
+
+    //grb: Grab action
+    static bool grab(const int argc,const arg_list argv)
+    {
+        servo_neck.SetAngle(SERVO_NECK_MID,2);
+        servo_tong.SetPulse(SERVO_TONG_GRAB);
+        servo_cleave.SetAngle(SERVO_CLEAVE_GRAB,2);
+        delay(1000);
+        servo_tong.TurnMin();
+        delay(400);
+        servo_cleave.TurnMax();
+        delay(200);
+        servo_neck.TurnMin();
+        return true;
+    }
+
+    //clm: climb action
+    //deprecated
+    static bool climb(const int argc,const arg_list argv)
+    {
+        servo_neck.TurnMin();
+
+        // 第一个台阶
+        motor_l.Forward();
+        motor_r.Forward();
+        delay(250); // 这个时间要够短，前轮刚好上去就行
+        motor_l.Off();
+        motor_r.Off();
+
+        servo_cleave.SetAngle(SERVO_CLEAVE_CLIMB,10);
+        motor_l.Forward();
+        motor_r.Forward();
+        delay(400); // 这里也要短一点，不要影响下一个台阶
+        motor_l.Off();
+        motor_r.Off();
+
+        servo_cleave.TurnMax();
+
+        // 第二个台阶
+        motor_l.Forward();
+        motor_r.Forward();
+        delay(500); // 这个时间要够短，前轮刚好上去就行
+        motor_l.Off();
+        motor_r.Off();
+
+        servo_cleave.TurnMax();
+        motor_l.Forward();
+        motor_r.Forward();
+        delay(550);
+        motor_l.Off();
+        motor_r.Off();
+
+        // 到此为止,已经爬过了两个台阶
+
+        // 下台阶
+        motor_l.Forward();
+        motor_r.Forward();
+        delay(400);
+        // motor_l.Brake();
+        // motor_r.Brake();
+        // delay(400); // 等稳定
+
+        safe_cleave_up(0,{});
+
+        motor_l.Off();
+        motor_r.Off();
+
+        return true;
+    }
+    //scu: safe cleave up action
+    static bool safe_cleave_up(const int argc,const arg_list argv)
+    {
+        servo_neck.SetAngle(SERVO_NECK_MID);
+        delay(800);
+        servo_cleave.TurnMax();
+        delay(700);
+        servo_neck.TurnMax();
+        return true;
+    }
+    //dnd: dont die action
+    static bool dont_die(const int argc,const arg_list argv)
+    {
+        servo_cleave.TurnMin();
+
+        motor_l.Forward();
+        motor_r.Forward();
+        delay(100);
+        motor_l.Off();
+        motor_r.Off();
+
+        servo_neck.SetAngle(SERVO_NECK_MID, 30);
+
+        servo_cleave.TurnMax();
+
+        servo_neck.TurnMax(); // 最后朝后
+        return true;
+    }
+
+    //Utils
+    //Servo analog
+    static void servo_analog(ServoBase& servo, const int argc, const arg_list argv)
+    {
+        auto& arg = argv[0];
+        int angle = arg.toInt();
+        servo.SetAngle(angle);
+    }
+    //Motor digital
+    static bool motor_digital(Motor& motor, const int argc, const arg_list argv)
+    {
+        auto& arg = argv[0];
+        if (arg == "f")
+        {
+            motor.Forward();
+        }
+        else if (arg == "b")
+        {
+            motor.Backward();
+        }
+        else if (arg == "ff")
+        {
+            motor.ForwardFullSpeed();
+        }
+        else if (arg == "bb")
+        {
+            motor.BackwardFullSpeed();
+        }
+        else if (arg == "off")
+        {
+            motor.Off();
+        }
+        else if (arg == "brk")
+        {
+            motor.Brake();
+        }
+        else return false;
+
+        return true;
+    }
+};
+const CommandFunction Commands::cmd_table[] = 
+    {
+        {"cld", 1, Commands::cleave_digital},   // Cleave on/off/clm/grb
+        {"clm", 0, Commands::climb},            // Climb action (deprecated)
+        {"dnd", 0, Commands::dont_die},         // Dont die action
+        {"grb", 0, Commands::grab},             // Grab action
+        {"mld", 1, Commands::motor_l_digital},  // Motor left forward/backward/off/brake
+        {"mrd", 1, Commands::motor_r_digital},  // Motor right forward/backward/off/brake
+        {"msd", 1, Commands::motor_step_digital}, // Motor step forward/backward/off/brake
+        {"nkd", 1, Commands::neck_digital},     // Neck on/off
+        {"scn", 0, Commands::scan},             // Scanner scan action
+        {"scu", 0, Commands::safe_cleave_up},   // Safe cleave up action
+        {"tgd", 1, Commands::tong_digital}      // Tong on/off/grab
+    };
+const int Commands::cmd_count = sizeof(cmd_table) / sizeof(cmd_table[0]);
 }
-
-void act_grab_handler()
-{
-    servo_neck.SetAngle(SERVO_NECK_MID,2);
-    servo_tong.SetPulse(SERVO_TONG_GRAB);
-    servo_cleave.SetAngle(SERVO_CLEAVE_GRAB,2);
-    delay(1000);
-    servo_tong.TurnMin();
-    delay(400);
-    servo_cleave.TurnMax();
-    delay(200);
-    servo_neck.TurnMin();
-}
-
-// 爬台阶命令,前轮到台阶就可以点,尽量靠右一点
-void act_climb_handler()
-{
-    servo_neck.TurnMin();
-
-    // 第一个台阶
-    motor_l.Forward();
-    motor_r.Forward();
-    delay(250); // 这个时间要够短，前轮刚好上去就行
-    motor_l.Off();
-    motor_r.Off();
-
-    servo_cleave.SetAngle(SERVO_CLEAVE_CLIMB,10);
-    motor_l.Forward();
-    motor_r.Forward();
-    delay(400); // 这里也要短一点，不要影响下一个台阶
-    motor_l.Off();
-    motor_r.Off();
-
-    servo_cleave.TurnMax();
-
-    // 第二个台阶
-    motor_l.Forward();
-    motor_r.Forward();
-    delay(500); // 这个时间要够短，前轮刚好上去就行
-    motor_l.Off();
-    motor_r.Off();
-
-    servo_cleave.TurnMax();
-    motor_l.Forward();
-    motor_r.Forward();
-    delay(550);
-    motor_l.Off();
-    motor_r.Off();
-
-    // 到此为止,已经爬过了两个台阶
-
-    // 下台阶
-    motor_l.Forward();
-    motor_r.Forward();
-    delay(400);
-    // motor_l.Brake();
-    // motor_r.Brake();
-    // delay(400); // 等稳定
-
-    act_safe_cleave_up_handler();
-
-    motor_l.Off();
-    motor_r.Off();
-}
-void act_safe_cleave_up_handler()
-{
-    servo_neck.SetAngle(SERVO_NECK_MID);
-    delay(800);
-    servo_cleave.TurnMax();
-    delay(700);
-    servo_neck.TurnMax();
-}
-void act_dont_die_handler()
-{
-    servo_cleave.TurnMin();
-
-    motor_l.Forward();
-    motor_r.Forward();
-    delay(100);
-    motor_l.Off();
-    motor_r.Off();
-
-    servo_neck.SetAngle(SERVO_NECK_MID, 30);
-
-    servo_cleave.TurnMax();
-
-    servo_neck.TurnMax(); // 最后朝后
-}
-void lcmd_motor_l_handler(int value)
-{
-    motor_l.Linear(value);
-}
-void lcmd_motor_r_handler(int value)
-{
-    motor_r.Linear(value);
-}
-}
-
 HeraCross::Commands commands;

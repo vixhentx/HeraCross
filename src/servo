@@ -3,11 +3,22 @@
 
 namespace HeraCross
 {
+struct ServoBase
+{
+    virtual void SetPulse(int pulse) = 0;
+    virtual void SetAngle(int angle) = 0;
+    virtual void TurnMax() = 0;
+    virtual void TurnMin() = 0;
 
-class PulseServo
+    virtual void SetPulse(int pulse,int rep) = 0;
+    virtual void SetAngle(int angle,int rep) = 0;
+    virtual void TurnMax(int rep) = 0;
+    virtual void TurnMin(int rep) = 0;
+};
+class PulseServo : ServoBase
 {
     private:
-    int pin,maxAngle,minAngle,pulse_width;
+    int pin,maxAngle,minAngle;
     unsigned long time_until=0;
     public:
     PulseServo(int _pin,int _maxAngle, int _minAngle)
@@ -17,7 +28,7 @@ class PulseServo
         minAngle=_minAngle;
         digitalWrite(pin,0);
     }
-    void SetPulse(int pulse)
+    void SetPulse(int pulse) override
     {
         if(micros()<time_until)delayMicroseconds(time_until-micros());
         digitalWrite(pin,1);
@@ -25,7 +36,7 @@ class PulseServo
         digitalWrite(pin,0);
         time_until=micros()+20000-pulse;//直接存储剩下需要delay的毫秒数，不使用delay阻塞
     }
-    void SetPulse(int pulse,int rep)
+    void SetPulse(int pulse,int rep) override
     {
         while(rep--)
         {
@@ -35,35 +46,35 @@ class PulseServo
             delay(20-pulse/1000);
         }
     }
-    void SetAngle(int angle)
+    void SetAngle(int angle) override
     {
         SetPulse(((angle*11)+500));
     }
-    void SetAngle(int angle,int rep)
+    void SetAngle(int angle,int rep) override
     {
         SetPulse(((angle*11)+500),rep);
     }
-    void TurnMax()
+    void TurnMax() override
     {
         SetAngle(maxAngle);
     }
-    void TurnMax(int rep)
+    void TurnMax(int rep) override
     {
         SetAngle(maxAngle,rep);
     }
-    void TurnMin()
+    void TurnMin() override
     {
         SetAngle(minAngle);
     }
-    void TurnMin(int rep)
+    void TurnMin(int rep) override
     {
         SetAngle(minAngle,rep);
     }
 };
-class DutyServo 
+class DutyServo : ServoBase
 {
     private:
-    int pin,maxAngle,minAngle,pulse_width;
+    int pin,maxAngle,minAngle;
     public:
     DutyServo(int _pin,int _maxAngle, int _minAngle)
     {
@@ -72,26 +83,32 @@ class DutyServo
         minAngle=_minAngle;
         digitalWrite(pin,0);
     }
-    void SetPulse(int pulse)
+    void SetPulse(int pulse) override
     {
         analogWrite(pin,pulse);
     }
-    void TurnMax()
+    void SetPulse(int pulse,int rep) override
+    {
+        while (rep--)SetPulse(pulse);
+    }
+    void TurnMax() override
     {
         SetPulse(maxAngle);
     }
-    void TurnMax(int rep)
+    void TurnMax(int rep) override
     {
         while(rep--)TurnMax();
     }
-    void TurnMin()
+    void TurnMin() override
     {
         SetPulse(minAngle);
     }
-    void TurnMin(int rep)
+    void TurnMin(int rep) override
     {
         while(rep--)TurnMin();
     }
-};
 
+    void SetAngle(int angle) override {SetPulse(angle);}
+    void SetAngle(int angle,int rep) override {SetPulse(angle,rep);}
+};
 }
