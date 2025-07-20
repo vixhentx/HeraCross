@@ -3,13 +3,15 @@
 #include "config"
 #include "conponent"
 #include "servo"
+#include "l3str"
 
 namespace HeraCross
 {
 struct CommandFunction
 {
-    using signature = bool(const int, String* const);
-    const String _name;
+    using signature = bool(const int, L3Str* const);
+    CommandFunction(const L3Str& name, const int argc, signature* const func) : _name(name), _argc(argc), _func(func) {}
+    const L3Str _name;
     const int _argc;
     signature* const _func;
 };
@@ -23,24 +25,26 @@ class CommandEngine
     void TryRun(const String& raw_cmd)
     {
         //Spilt
-        String args[CMD_ARG_SIZE];
+        L3Str args[CMD_ARG_SIZE]={};
         int args_len = 0;
-        if(raw_cmd.length() > 0)
+        unsigned raw_len  = raw_cmd.length() - 1;
+        if(raw_len > 0)
         {
-            int w = 0, i = 0;
+            unsigned i = 0;
             do
             {
-                if(raw_cmd[i]!=' ')i++;
+                if(!(raw_cmd[i]==' '||raw_cmd[i]=='\0'||raw_cmd[i]=='\n'))
+                {
+                    args[args_len]+=raw_cmd[i];
+                }
                 else
                 {
-                    args[args_len++] = raw_cmd.substring(w,i);
-                    w=i+1;
-                    i+=2;
+                    args_len++;
                 }
-            }while(i<raw_cmd.length());
-            args[args_len++] = raw_cmd.substring(w,i-1);
+                i++;
+            }while(i<raw_len);
+            args_len++;
         }
-
         //Find
         unsigned int l=0,r=_cmd_count;
         while(l<r)
@@ -52,9 +56,9 @@ class CommandEngine
         //Execute
         if(l<_cmd_count && _table[l]._name==args[0])
         {
-            if(_table[l]._argc==args_len-1)
+            if(_table[l]._argc==args_len)
             {
-                bool ret = _table[l]._func(args_len-1,args+1);
+                bool ret = _table[l]._func(args_len,args);
                 if(ret)
                 {
                     TRACESV("Command executed", args[0]);
@@ -80,7 +84,7 @@ class CommandEngine
 class Commands : public CommandEngine
 {
 public:
-    using arg_list = String*;
+    using arg_list = L3Str*;
     const static CommandFunction cmd_table[];
     const static int cmd_count;
 
@@ -89,7 +93,7 @@ public:
     //tgd: Tong on/off/grab
     static bool tong_digital(const int argc,const arg_list argv)
     {
-        auto& arg = argv[0];
+        auto& arg = argv[1];
         if (arg == "on")
         {
             servo_tong.TurnMax();
@@ -98,7 +102,7 @@ public:
         {
             servo_tong.TurnMin();
         }
-        else if (arg == "grab")
+        else if (arg == "grb")
         {
             servo_tong.SetPulse(SERVO_TONG_GRAB);
         }
@@ -109,7 +113,7 @@ public:
     //nkd: Neck on/off
     static bool neck_digital(const int argc,const arg_list argv)
     {
-        auto& arg = argv[0];
+        auto& arg = argv[1];
         if (arg == "on")
         {
             servo_neck.TurnMax();
@@ -125,7 +129,7 @@ public:
     //cld: Cleave on/off
     static bool cleave_digital(const int argc,const arg_list argv)
     {
-        auto& arg = argv[0];
+        auto& arg = argv[1];
         if (arg == "on")
         {
             servo_cleave.TurnMax();
@@ -142,7 +146,11 @@ public:
         {
             servo_cleave.SetAngle(SERVO_CLEAVE_GRAB);
         }
-        else return false;
+        else 
+        {
+            TRACESV("arg:", arg);
+            return false;
+        }
 
         return true;
     }
@@ -282,14 +290,14 @@ public:
     //Servo analog
     static void servo_analog(ServoBase& servo, const int argc, const arg_list argv)
     {
-        auto& arg = argv[0];
-        int angle = arg.toInt();
+        auto& arg = argv[1];
+        int angle = static_cast<uint16_t>(arg);
         servo.SetAngle(angle);
     }
     //Motor digital
     static bool motor_digital(Motor& motor, const int argc, const arg_list argv)
     {
-        auto& arg = argv[0];
+        auto& arg = argv[1];
         if (arg == "f")
         {
             motor.Forward();
@@ -321,17 +329,17 @@ public:
 };
 const CommandFunction Commands::cmd_table[] = 
     {
-        {"cld", 1, Commands::cleave_digital},   // Cleave on/off/clm/grb
-        {"clm", 0, Commands::climb},            // Climb action (deprecated)
-        {"dnd", 0, Commands::dont_die},         // Dont die action
-        {"grb", 0, Commands::grab},             // Grab action
-        {"mld", 1, Commands::motor_l_digital},  // Motor left forward/backward/off/brake
-        {"mrd", 1, Commands::motor_r_digital},  // Motor right forward/backward/off/brake
-        {"msd", 1, Commands::motor_step_digital}, // Motor step forward/backward/off/brake
-        {"nkd", 1, Commands::neck_digital},     // Neck on/off
-        {"scn", 0, Commands::scan},             // Scanner scan action
-        {"scu", 0, Commands::safe_cleave_up},   // Safe cleave up action
-        {"tgd", 1, Commands::tong_digital}      // Tong on/off/grab
+        {"cld", 2, Commands::cleave_digital},   // Cleave on/off/clm/grb
+        {"clm", 1, Commands::climb},            // Climb action (deprecated)
+        {"dnd", 1, Commands::dont_die},         // Dont die action
+        {"grb", 1, Commands::grab},             // Grab action
+        {"mld", 2, Commands::motor_l_digital},  // Motor left forward/backward/off/brake
+        {"mrd", 2, Commands::motor_r_digital},  // Motor right forward/backward/off/brake
+        {"msd", 2, Commands::motor_step_digital}, // Motor step forward/backward/off/brake
+        {"nkd", 2, Commands::neck_digital},     // Neck on/off
+        {"scn", 1, Commands::scan},             // Scanner scan action
+        {"scu", 1, Commands::safe_cleave_up},   // Safe cleave up action
+        {"tgd", 2, Commands::tong_digital}      // Tong on/off/grab
     };
 const int Commands::cmd_count = sizeof(cmd_table) / sizeof(cmd_table[0]);
 }

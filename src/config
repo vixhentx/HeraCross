@@ -5,7 +5,7 @@
 /  Debug Config
 ////////////////////
 */
-#define DEBUG_MODE 1
+// #define DEBUG_MODE 1
 // #define SCREEN_ON 1
 
 /*

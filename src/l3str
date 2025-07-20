@@ -1,0 +1,36 @@
+#pragma once
+
+#include <stdint.h>
+namespace HeraCross
+{
+    struct L3Str
+    {
+        uint16_t _content;
+        L3Str() = default;
+        L3Str(uint16_t content) : _content(content) {}
+        L3Str(const char* name) : _content(conv_name(name)) {}
+        bool operator==(const L3Str& other) const { return _content == other._content; }
+        bool operator<(const L3Str& other) const { return _content < other._content; }
+        operator uint16_t () const
+        {
+            return _content;
+        }
+        L3Str operator+=(char c)
+        {
+            _content = _content*27 + c - 'a' + 1;
+            return *this;
+        }
+        private:
+        //name must be little
+        static uint16_t conv_name(const char* name)
+        {
+            auto p = (char*) name;
+            auto ret = 0;
+            while(*p)
+            {
+                ret = ret*27 + (*p++) - 'a' + 1;
+            }
+            return ret;
+        }
+    };
+}
