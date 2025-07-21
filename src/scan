@@ -47,7 +47,7 @@ class Scan
         return true;
     }
     //读取颜色，并将颜色写到
-    bool get(int wait_time=1000)
+    bool get(int wait_time=50)
     {
         int i;
         serial->read();
@@ -71,11 +71,11 @@ class Scan
             return false;
         }
         TRACE("scan result received");
-        for(i=0;i<(int)sizeof(HCMD_SUCCESS_SCAN);i++)
-        {
-            if(buf[i]!=HCMD_SUCCESS_SCAN[i])return false;
-        }
-        TRACE("scan tocken verified");
+        // for(i=0;i<(int)sizeof(HCMD_SUCCESS_SCAN);i++)
+        // {
+        //     if(buf[i]!=HCMD_SUCCESS_SCAN[i])return false;
+        // }
+        // TRACE("scan tocken verified");
         result=buf+sizeof(HCMD_SUCCESS_SCAN);
         TRACESV("scan result:",result);
         return true;
