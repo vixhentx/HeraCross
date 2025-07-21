@@ -1,5 +1,6 @@
 #pragma once
 
+#include "clib/u8x8.h"
 #include "config"  
 
 #ifdef SCREEN_ON
@@ -32,9 +33,9 @@ class Screen
         u8x8->setFlipMode(2);
         u8x8->setFont(u8x8_font_courB18_2x3_f);
         u8x8->clearDisplay();
-        u8x8->drawString(0,0,"Hera");
-        u8x8->drawString(4,20,"Cross");
-        u8x8->refreshDisplay();
+        // u8x8->drawString(0,0,"Hera");
+        // u8x8->drawString(4,20,"Cross");
+        // u8x8->refreshDisplay();
         TRACE("Screen Init Completed");
         #endif
     }
@@ -51,12 +52,10 @@ class Screen
     {
         #ifdef SCREEN_ON
         u8x8->clearDisplay();
-        u8x8->setFont(u8x8_font_courB18_2x3_f);
-        u8x8->drawString(0,0,color_text[target]);
         char tmp[16];
-        sprintf(tmp,"%s,%s,%s",color_text[seq[0]],color_text[seq[1]],color_text[seq[2]]);
-        u8x8->setFont(u8x8_font_7x14_1x2_f);
-        u8x8->drawString(0,20,tmp);
+        sprintf(tmp,"%d+%d%d%d",target,seq[0],seq[1],seq[2]);
+        u8x8->setFont(u8x8_font_8x13B_1x2_r);
+        u8x8->drawString(0,0,tmp);
         u8x8->refreshDisplay();
         #endif
     }

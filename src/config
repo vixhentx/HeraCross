@@ -33,7 +33,7 @@
 ////////////////////
 */
 #define MOTOR_L_PULSE 255
-#define MOTOR_R_PULSE 255
+#define MOTOR_R_PULSE 242
 
 /*
 ////////////////////
@@ -46,7 +46,7 @@
 #define SERVO_TONG_MAX 180
 #define SERVO_TONG_GRAB 160
 
-#define SERVO_CLEAVE_MIN 9
+#define SERVO_CLEAVE_MIN 0
 #define SERVO_CLEAVE_MAX 120
 #define SERVO_CLEAVE_CLIMB 30
 #define SERVO_CLEAVE_GRAB 15
