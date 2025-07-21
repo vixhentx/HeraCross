@@ -87,6 +87,7 @@
 #define CMD_STEP_F 51
 #define CMD_STEP_B 52
 #define CMD_STEP_HALT 53
+#define CMD_MICRO_MODE 54
 
 #define CMD_SCAN 60
 

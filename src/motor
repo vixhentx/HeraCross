@@ -6,17 +6,13 @@ namespace HeraCross
 class Motor
 {
     private:
-    int pinN,pinP,fPulse;
+    const int pinN,pinP,base_fPulse;
+    int fPulse = base_fPulse;
+    bool micro_mode  = false;
     public:
-    Motor(int _pinN, int _pinP, int _fPulse=255)
-    {
-        pinN=_pinN;
-        pinP=_pinP;
-        fPulse=_fPulse;
-        
-    }
+    Motor(int _pinN, int _pinP, int _fPulse=255) : pinN(_pinN), pinP(_pinP), base_fPulse(_fPulse){}
     //设定电机转动的速度，pulse: -255~0~255
-    void SetPulse(int pulse)
+    void SetPulse(int pulse) const
     {
         if(pulse>=0)
         {
@@ -29,37 +25,43 @@ class Motor
             digitalWrite(pinP,0);
         }
     }
-    void Forward()
+    void Forward() const
     {
         SetPulse(fPulse);
     }
-    void Backward()
+    void Backward() const
     {
         SetPulse(-fPulse);
     }
-    void ForwardFullSpeed()
+    void ForwardFullSpeed() const
     {
         digitalWrite(pinN,0);
         digitalWrite(pinP,1);
     }
-    void BackwardFullSpeed()
+    void BackwardFullSpeed() const
     {
         digitalWrite(pinN,1);
         digitalWrite(pinP,0);
     }
-    void Off()
+    void Off() const
     {
         digitalWrite(pinN,0);
         digitalWrite(pinP,0);
     }
-    void Brake()
+    void Brake() const
     {
         digitalWrite(pinN,1);
         digitalWrite(pinP,1);
     }
-    void Linear(int speed)
+    void Linear(int speed) const
     {
         SetPulse(map(speed,-255,255,-fPulse,fPulse));
+    }
+    //Switch the micro mode on/off
+    void MicroMode()
+    {
+        micro_mode =!micro_mode;
+        fPulse = base_fPulse / (micro_mode? 3 : 1);
     }
 };
 }

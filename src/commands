@@ -26,6 +26,7 @@ void cmd_cleave_on_handler();
 void cmd_step_f_handler();
 void cmd_step_b_handler();
 void cmd_step_halt_handler();
+void cmd_mircro_mode();
 void cmd_scan_handler();
 void act_grab_handler();
 void act_climb_handler();
@@ -63,6 +64,7 @@ public:
         REG_CMD(CMD_STEP_F, cmd_step_f_handler);
         REG_CMD(CMD_STEP_B, cmd_step_b_handler);
         REG_CMD(CMD_STEP_HALT, cmd_step_halt_handler);
+        REG_CMD(CMD_MICRO_MODE, cmd_mircro_mode);
         REG_CMD(CMD_SCAN, cmd_scan_handler);
         REG_CMD(ACT_GRAB, act_grab_handler);
         REG_CMD(ACT_CLIMB, act_climb_handler);
@@ -194,6 +196,11 @@ void cmd_step_halt_handler()
 {
     motor_l.Off();
     motor_r.Off();
+}
+void cmd_mircro_mode()
+{
+    motor_l.MicroMode();
+    motor_r.MicroMode();
 }
 void cmd_scan_handler()
 {
