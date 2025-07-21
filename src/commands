@@ -2,6 +2,7 @@
 #include "Arduino.h"
 #include "config"
 #include "conponent"
+#include "scan"
 
 namespace HeraCross
 {
@@ -198,16 +199,11 @@ void cmd_scan_handler()
 {
     if (scan.get())
     {
-        Serial.print("Target:");
-        Serial.println(colornames[scan.target]);
-        Serial.print("Seq:");
-        for (int i = 0; i < COLOR_SEQ_COUNT; i++)
-        {
-            Serial.print(colornames[scan.seq[i]]);
-            Serial.print(",");
-        }
-        Serial.println();
-        screen.ShowColor(scan.target, scan.seq);
+        screen.ShowColor(scan.result);
+    }
+    else 
+    {
+        Serial.println("scan failed");
     }
 }
 

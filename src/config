@@ -5,7 +5,7 @@
 /  Debug Config
 ////////////////////
 */
-#define DEBUG_MODE 1
+// #define DEBUG_MODE 1
 #define SCREEN_ON 1
 
 /*
@@ -105,15 +105,6 @@
 /  Color Config
 ////////////////////
 */
-enum Color {
-    COLOR_NONE=0,
-    COLOR_RED=1,
-    COLOR_GREEN=2,
-    COLOR_BLUE=3
-};
-const char* colornames[]={"None","Red","Green","Blue"};
-
-#define COLOR_SEQ_COUNT 3
 #define COLOR_BUF_SIZE 20
 #define COLOR_SAMPLE_SIZE 6
 
