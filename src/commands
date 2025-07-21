@@ -272,10 +272,7 @@ void act_climb_handler()
 }
 void act_safe_cleave_up_handler()
 {
-    servo_neck.SetAngle(SERVO_NECK_MID);
-    delay(800);
     servo_cleave.TurnMax();
-    delay(700);
     servo_neck.TurnMax();
 }
 void act_dont_die_handler()
